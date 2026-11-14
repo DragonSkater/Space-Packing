@@ -71,7 +71,11 @@ Commands, run from the project root (`$GODOT` stands for the path above):
 $GODOT --headless --path . --import                         # refresh the class cache; run after adding scripts or resources
 $GODOT --headless --path . res://tests/test_runner.tscn     # run all tests; exit code 0 means pass
 $GODOT --path .                                             # launch the game
+$GODOT --headless --path . --export-release "Web"           # export the browser build to Builds/web/ (the path is set in the Web preset)
+python -m http.server 8060 --bind 127.0.0.1 --directory Builds/web   # serve it to this machine only; open http://127.0.0.1:8060/Space-Packing.html
 ```
+
+The export prints "No loader found" errors for the C# files of the unused Dialogue Manager addon. They come from the addon, not from this project's code, and the build is still complete. `Builds/` holds a `.gdignore` so the engine does not import its own export output.
 
 Milestone 0 creates the test runner. If one of these commands does not behave as described on 4.7.2, fix the command in this file as part of your work and say so.
 

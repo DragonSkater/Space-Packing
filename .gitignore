@@ -2,7 +2,9 @@
 .godot/
 
 # Export output. The browser build is made locally and is not source.
-Builds/
+# The .gdignore is kept: it stops the engine importing its own export output.
+Builds/*
+!Builds/.gdignore
 build/
 
 # Android build template, if it is ever installed into the project

@@ -11,14 +11,27 @@ config_version=5
 [application]
 
 config/name="LILA-TEST"
-run/main_scene="uid://cwym6g4uen2bb"
+run/main_scene="res://ui/boot/boot.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
 
+[autoload]
+
+Catalog="*res://game/app/catalog.gd"
+Tuning="*res://game/app/tuning.gd"
+GameState="*res://game/app/game_state.gd"
+
 [display]
 
+window/size/viewport_width=402
+window/size/viewport_height=874
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
 
 [physics]
 
