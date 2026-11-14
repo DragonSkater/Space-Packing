@@ -156,7 +156,7 @@ func test_granting_moves_raises_the_moves_left() -> void:
 	var session: PackingSession = _session_with_one_single_loaded(5)
 	session.grant_moves(2)
 	assert_eq(session.moves_left(), 6)
-	assert_eq(session.move_limit(), 7)
+	assert_eq(session.moves_allowed(), 7)
 	assert_eq(session.moves_used(), 1)
 
 
@@ -192,6 +192,23 @@ func _push_to_the_back(session: PackingSession, lane_index: int) -> void:
 	session.pick_from_stack(0)
 	var lane: EntryLane = session.entry_lanes()[lane_index]
 	session.push_in(lane, lane.stops.size() - 1)
+
+
+func test_a_manifest_line_with_no_item_type_is_skipped_and_reported_as_a_problem() -> void:
+	var empty_line: Batch = Batch.new()
+	var manifest: Array[Batch] = [empty_line, CoreFixtures.batch(CoreFixtures.item_type("X"), 2)]
+	var session: PackingSession = CoreFixtures.session(ROWS, manifest)
+	assert_eq(session.stack().size(), 2)
+	assert_eq(session.required_items_left(), 2)
+	assert_eq(empty_line.problems().size(), 1)
+	assert_eq(manifest[1].problems(), [] as Array[String])
+
+
+func test_an_item_type_whose_drawing_is_empty_or_in_two_parts_is_a_problem() -> void:
+	assert_eq(CoreFixtures.item_type("..").problems().size(), 1, "no X at all")
+	assert_eq(CoreFixtures.item_type("X.X").problems().size(), 1, "two separate cells")
+	assert_eq(CoreFixtures.item_type("X.
+XX").problems(), [] as Array[String], "an L is fine")
 
 
 func _session_of_singles_and_a_pair(move_limit: int, tuning: PackingTuning) -> PackingSession:

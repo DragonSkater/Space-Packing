@@ -73,9 +73,14 @@ $GODOT --headless --path . res://tests/test_runner.tscn     # run all tests; exi
 $GODOT --path .                                             # launch the game
 $GODOT --headless --path . --export-release "Web"           # export the browser build to Builds/web/ (the path is set in the Web preset)
 python -m http.server 8060 --bind 127.0.0.1 --directory Builds/web   # serve it to this machine only; open http://127.0.0.1:8060/Space-Packing.html
+python tests/check_script_warnings.py $GODOT                # fail on any script warning; exit code 0 means none
 ```
 
-The export prints "No loader found" errors for the C# files of the unused Dialogue Manager addon. They come from the addon, not from this project's code, and the build is still complete. `Builds/` holds a `.gdignore` so the engine does not import its own export output.
+Notes on these commands, found on 4.7.2:
+
+- The import and test commands do not print GDScript warnings: the engine sends those only to an attached editor. The last command is how to check for them. It works on a temporary copy and changes nothing in the project.
+- The Web preset leaves `addons/`, `tests/`, `docs/` and `screens/` out of the build (`exclude_filter` in `export_presets.cfg`). The unused Dialogue Manager addon has C# files this engine build cannot load, and exporting them printed errors. If the addon is given a role (PLAN.md, D13), take `addons/*` out of that filter.
+- `Builds/` holds a `.gdignore` so the engine does not import its own export output.
 
 Milestone 0 creates the test runner. If one of these commands does not behave as described on 4.7.2, fix the command in this file as part of your work and say so.
 

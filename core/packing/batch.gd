@@ -8,3 +8,10 @@ extends Resource
 @export_range(1, 32) var count: int = 1
 ## The round insists that every item of this batch is in the container.
 @export var required: bool = true
+
+
+## Plain sentences for mistakes that make this line of a manifest unusable.
+func problems() -> Array[String]:
+	if item_type == null:
+		return ["A batch names no item type."]
+	return item_type.problems()

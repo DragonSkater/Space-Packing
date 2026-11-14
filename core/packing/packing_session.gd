@@ -41,8 +41,13 @@ func _init(layout: ContainerLayout, manifest: Array[Batch], tuning: PackingTunin
 	_budget = MoveBudget.new(move_limit)
 	# The first batch ends up on top, each item turned as its type draws it.
 	for batch_index: int in manifest.size():
-		for _copy: int in manifest[batch_index].count:
-			var item: PackItem = PackItem.new(_all_items.size(), manifest[batch_index].item_type, batch_index)
+		var batch: Batch = manifest[batch_index]
+		# A manifest line left empty in the Inspector is skipped so the round
+		# still runs. Batch.problems() is where that mistake is reported.
+		if batch == null or batch.item_type == null:
+			continue
+		for _copy: int in batch.count:
+			var item: PackItem = PackItem.new(_all_items.size(), batch.item_type, batch_index)
 			_all_items.append(item)
 			_stack.append(item)
 
@@ -203,7 +208,7 @@ func moves_used() -> int:
 
 
 ## The round's moves, including any granted since it began.
-func move_limit() -> int:
+func moves_allowed() -> int:
 	return _budget.limit()
 
 
