@@ -1,0 +1,13 @@
+# Godot's import cache and editor state. Rebuilt by: godot --headless --path . --import
+.godot/
+
+# Export output. The browser build is made locally and is not source.
+Builds/
+build/
+
+# Android build template, if it is ever installed into the project
+/android/
+
+# Local tool settings
+.claude/
+*.tmp

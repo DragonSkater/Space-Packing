@@ -1,0 +1,3 @@
+# Godot writes its text files with LF line endings. Keep them that way on
+# Windows so git never rewrites a file the engine or the designer wrote.
+* text=auto eol=lf
