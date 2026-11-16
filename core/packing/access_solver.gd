@@ -13,6 +13,13 @@
 class_name AccessSolver
 extends RefCounted
 
+# Where to look
+#   Asked by:   core/packing/packing_session.gd -> entry_lanes(), shift_range(), blockers(), turn()
+#   Answers in: core/packing/entry_lane.gd, core/packing/shift_range.gd, core/packing/turn_option.gd
+#   Reads:      core/packing/pack_state.gd -> fits(), is_free()
+#               core/grid/container_layout.gd -> is_passable(), in_bounds(), is_door()
+#   Tests:      tests/core/test_access_solver.gd
+
 const SIDES: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT]
 
 
@@ -139,6 +146,7 @@ static func _is_fully_outside(layout: ContainerLayout, shape: CellShape, origin:
 	return true
 
 
+# Notes the door cells a shape covers at one position, for EntryLane.door_cells.
 static func _add_door_cells(layout: ContainerLayout, shape: CellShape, origin: Vector2i, door_cells: Array[Vector2i]) -> void:
 	for cell: Vector2i in shape.cells_at(origin):
 		if layout.is_door(cell) and not door_cells.has(cell):
@@ -152,6 +160,7 @@ static func _quarter_turn(offset: Vector2i, clockwise: bool) -> Vector2i:
 	return Vector2i(offset.y, -offset.x)
 
 
+# The top-left corner of the rectangle round some cells: an item's origin.
 static func _top_left_of(cells: Array[Vector2i]) -> Vector2i:
 	var corner: Vector2i = cells[0]
 	for cell: Vector2i in cells:

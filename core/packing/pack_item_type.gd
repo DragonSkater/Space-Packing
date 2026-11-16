@@ -4,6 +4,11 @@
 class_name PackItemType
 extends Resource
 
+# Where to look
+#   Listed in:  core/packing/batch.gd
+#   Its shape:  core/grid/cell_shape.gd -> from_text()
+#   Tests:      tests/core/test_packing_session.gd
+
 @export var id: StringName
 @export var display_name: String = ""
 ## Rules match on these names. Free text; invent new ones at will.
@@ -38,6 +43,7 @@ func problems() -> Array[String]:
 	return found
 
 
+# The name used in problem sentences.
 func _name() -> String:
 	if display_name.is_empty():
 		return String(id)

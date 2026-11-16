@@ -5,6 +5,11 @@
 class_name EntryLane
 extends RefCounted
 
+# Where to look
+#   Made by:    core/packing/access_solver.gd -> entry_lanes()
+#   Used by:    core/packing/packing_session.gd -> push_in()
+#   Tests:      tests/core/test_access_solver.gd
+
 ## The side of the container the lane starts on: Vector2i.LEFT or RIGHT.
 var side: Vector2i = Vector2i.LEFT
 ## The row of the item's top-left corner as it slides in.
@@ -22,6 +27,7 @@ func inward() -> Vector2i:
 	return -side
 
 
+## True when both lanes enter from the same side at the same row.
 func is_same_lane(other: EntryLane) -> bool:
 	return side == other.side and row == other.row
 

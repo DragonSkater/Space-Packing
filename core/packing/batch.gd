@@ -4,6 +4,12 @@
 class_name Batch
 extends Resource
 
+# Where to look
+#   Listed in:  core/packing/packing_scenario.gd (the manifest field)
+#   Read by:    core/packing/packing_session.gd -> _init(), required_items_left()
+#   Its type:   core/packing/pack_item_type.gd
+#   Tests:      tests/core/test_packing_session.gd
+
 @export var item_type: PackItemType
 @export_range(1, 32) var count: int = 1
 ## The round insists that every item of this batch is in the container.

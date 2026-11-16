@@ -5,6 +5,11 @@
 class_name LegendEntry
 extends Resource
 
+# Where to look
+#   Listed in:  core/grid/layout_legend.gd
+#   Read by:    core/grid/container_layout.gd -> entry_at(), tags_at()
+#   Tests:      tests/core/test_container_layout.gd
+
 ## The single character that stands for this kind of cell in a layout text.
 @export var symbol: String = ""
 ## An item can slide through this cell.

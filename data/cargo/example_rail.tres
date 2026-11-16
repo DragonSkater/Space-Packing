@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PackItemType" format=3]
+
+[ext_resource type="Script" path="res://core/packing/pack_item_type.gd" id="1_type"]
+
+[resource]
+script = ExtResource("1_type")
+id = &"example_rail"
+display_name = "Rail"
+tags = Array[StringName]([])
+shape_text = "XX"
+can_rotate = false
+weight = 2.0
+base_value = 150.0
+colour = Color(0.68, 0.62, 0.88, 1)

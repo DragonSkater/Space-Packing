@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="LayoutLegend" format=3]
+
+[ext_resource type="Script" path="res://core/grid/layout_legend.gd" id="1_legend"]
+[ext_resource type="Script" path="res://core/grid/legend_entry.gd" id="2_entry"]
+
+[sub_resource type="Resource" id="wall"]
+script = ExtResource("2_entry")
+symbol = "#"
+passable = false
+storable = false
+tags = Array[StringName]([&"hull"])
+label = ""
+colour = Color(0.33, 0.36, 0.43, 1)
+
+[sub_resource type="Resource" id="spot"]
+script = ExtResource("2_entry")
+symbol = "."
+passable = true
+storable = true
+tags = Array[StringName]([])
+label = ""
+colour = Color(0.17, 0.19, 0.25, 1)
+
+[sub_resource type="Resource" id="door"]
+script = ExtResource("2_entry")
+symbol = "D"
+passable = true
+storable = false
+tags = Array[StringName]([&"door"])
+label = "D"
+colour = Color(0.16, 0.42, 0.47, 1)
+
+[sub_resource type="Resource" id="bulkhead"]
+script = ExtResource("2_entry")
+symbol = "|"
+passable = false
+storable = false
+tags = Array[StringName]([])
+label = ""
+colour = Color(0.46, 0.4, 0.58, 1)
+
+[sub_resource type="Resource" id="engine"]
+script = ExtResource("2_entry")
+symbol = "E"
+passable = false
+storable = false
+tags = Array[StringName]([&"engine"])
+label = "E"
+colour = Color(0.76, 0.4, 0.14, 1)
+
+[sub_resource type="Resource" id="bay"]
+script = ExtResource("2_entry")
+symbol = "G"
+passable = true
+storable = true
+tags = Array[StringName]([&"example_bay"])
+label = "G"
+colour = Color(0.35, 0.75, 0.45, 1)
+
+[resource]
+script = ExtResource("1_legend")
+entries = Array[ExtResource("2_entry")]([SubResource("wall"), SubResource("spot"), SubResource("door"), SubResource("bulkhead"), SubResource("engine"), SubResource("bay")])

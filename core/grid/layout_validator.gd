@@ -6,6 +6,11 @@
 class_name LayoutValidator
 extends RefCounted
 
+# Where to look
+#   Checks:     core/grid/container_layout.gd -> unknown_symbols(), storable_cells(), overlay_cells()
+#   Used by:    core/packing/packing_scenario.gd -> problems(), warnings()
+#   Tests:      tests/core/test_layout_validator.gd
+
 const NEIGHBOUR_STEPS: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 
 
@@ -37,6 +42,7 @@ static func warnings(layout: ContainerLayout) -> Array[String]:
 	return found
 
 
+# True when at least one cell is a door.
 static func _has_door(layout: ContainerLayout) -> bool:
 	for row: int in layout.size().y:
 		for column: int in layout.size().x:
@@ -45,6 +51,7 @@ static func _has_door(layout: ContainerLayout) -> bool:
 	return false
 
 
+# True when a side of the cell faces an outside cell.
 static func _touches_outside(layout: ContainerLayout, cell: Vector2i) -> bool:
 	for step: Vector2i in NEIGHBOUR_STEPS:
 		if layout.is_outside(cell + step):
@@ -84,6 +91,7 @@ static func _row_is_open(layout: ContainerLayout, row: int, from_column: int, to
 	return true
 
 
+# An overlay of the wrong size, or a mark on a cell where nothing can rest.
 static func _overlay_warnings(layout: ContainerLayout) -> Array[String]:
 	var found: Array[String] = []
 	var overlay_size: Vector2i = layout.overlay_size()
@@ -97,5 +105,6 @@ static func _overlay_warnings(layout: ContainerLayout) -> Array[String]:
 	return found
 
 
+# A cell as the sentences name it, counting from 1.
 static func _place(cell: Vector2i) -> String:
 	return "column %d, row %d" % [cell.x + 1, cell.y + 1]

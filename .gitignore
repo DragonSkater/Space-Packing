@@ -10,6 +10,10 @@ build/
 # Android build template, if it is ever installed into the project
 /android/
 
+# TLS certificates and keys for serving the browser build over the local network
+*.pem
+*.key
+
 # Local tool settings
 .claude/
 *.tmp

@@ -5,6 +5,12 @@
 class_name PackState
 extends RefCounted
 
+# Where to look
+#   Changed by: core/packing/packing_session.gd -> push_in(), shift(), turn(), unload()
+#   Asked by:   core/packing/access_solver.gd -> entry_lanes(), shift_range(), turn_option()
+#   Its grid:   core/grid/container_layout.gd
+#   Tests:      tests/core/test_access_solver.gd, tests/core/test_packing_scenario.gd
+
 signal changed
 
 const NO_ITEM: int = -1
@@ -16,6 +22,7 @@ var _items: Array[PackItem] = []
 var _occupant_ids: Dictionary[Vector2i, int] = {}
 
 
+# Starts empty.
 func _init(container_layout: ContainerLayout) -> void:
 	layout = container_layout
 
@@ -31,12 +38,14 @@ func fits(shape: CellShape, origin: Vector2i, ignore_item_id: int = NO_ITEM) -> 
 	return true
 
 
+## True when no item, other than the one ignored, covers the cell.
 func is_free(cell: Vector2i, ignore_item_id: int = NO_ITEM) -> bool:
 	if not _occupant_ids.has(cell):
 		return true
 	return _occupant_ids[cell] == ignore_item_id
 
 
+## Puts an item into the container at an origin where it fits.
 func place(item: PackItem, origin: Vector2i) -> void:
 	if not fits(item.shape, origin):
 		push_error("PackState.place: item %d does not fit at %s." % [item.id, origin])
@@ -47,6 +56,7 @@ func place(item: PackItem, origin: Vector2i) -> void:
 	changed.emit()
 
 
+## Takes an item out of the container and returns it.
 func remove(item_id: int) -> PackItem:
 	var item: PackItem = item_by_id(item_id)
 	if item == null:
@@ -78,6 +88,7 @@ func item_at(cell: Vector2i) -> PackItem:
 	return item_by_id(_occupant_ids[cell])
 
 
+## The item with this id, or null when it is not in the container.
 func item_by_id(item_id: int) -> PackItem:
 	for item: PackItem in _items:
 		if item.id == item_id:
@@ -85,6 +96,7 @@ func item_by_id(item_id: int) -> PackItem:
 	return null
 
 
+## Every item in the container, in the order they were placed.
 func items() -> Array[PackItem]:
 	return _items.duplicate()
 
@@ -97,11 +109,21 @@ func fill_ratio() -> float:
 	return float(_occupant_ids.size()) / float(storable_count)
 
 
+## The weights of every item in the container, added up.
+func total_weight() -> float:
+	var total: float = 0.0
+	for item: PackItem in _items:
+		total += item.type.weight
+	return total
+
+
+# Records the item as the occupant of each cell it covers.
 func _cover_cells(item: PackItem) -> void:
 	for cell: Vector2i in item.cells():
 		_occupant_ids[cell] = item.id
 
 
+# Clears the item from the cells it covers.
 func _uncover_cells(item: PackItem) -> void:
 	for cell: Vector2i in item.cells():
 		_occupant_ids.erase(cell)

@@ -4,5 +4,10 @@
 class_name TurnOption
 extends RefCounted
 
+# Where to look
+#   Made by:    core/packing/access_solver.gd -> turn_option()
+#   Used by:    core/packing/packing_session.gd -> turn()
+#   Tests:      tests/core/test_access_solver.gd
+
 var shape: CellShape
 var origin: Vector2i = Vector2i.ZERO

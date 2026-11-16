@@ -6,6 +6,14 @@
 class_name ContainerLayout
 extends RefCounted
 
+# Where to look
+#   Made by:    core/packing/packing_scenario.gd -> layout()
+#   Reads:      core/grid/layout_legend.gd -> entry_for()
+#   Used by:    core/packing/pack_state.gd -> fits()
+#               core/packing/access_solver.gd -> entry_lanes(), shift_range()
+#               core/grid/layout_validator.gd -> problems(), warnings()
+#   Tests:      tests/core/test_container_layout.gd
+
 const OUTSIDE_SYMBOL: String = " "
 const OVERLAY_BLANK_SYMBOLS: Array[String] = [".", " "]
 
@@ -32,14 +40,17 @@ static func parse(text: String, legend: LayoutLegend, overlay_text: String = "")
 	return layout
 
 
+## Columns and rows of the layout text.
 func size() -> Vector2i:
 	return _size
 
 
+## True for a cell inside the layout's bounding rectangle.
 func in_bounds(cell: Vector2i) -> bool:
 	return cell.x >= 0 and cell.y >= 0 and cell.x < _size.x and cell.y < _size.y
 
 
+## True when an item can come to rest on the cell.
 func is_storable(cell: Vector2i) -> bool:
 	return entry_at(cell).storable
 
@@ -62,6 +73,7 @@ func is_outside(cell: Vector2i) -> bool:
 	return not _entries.has(cell) and not _unknown_symbols.has(cell)
 
 
+## The zone tags on a cell: its own, plus any that an overlay added.
 func tags_at(cell: Vector2i) -> Array[StringName]:
 	var tags: Array[StringName] = entry_at(cell).tags.duplicate()
 	var marked: LegendEntry = overlay_entry_at(cell)
@@ -72,6 +84,7 @@ func tags_at(cell: Vector2i) -> Array[StringName]:
 	return tags
 
 
+## The legend entry for a cell. Outside and unknown cells get a stand-in.
 func entry_at(cell: Vector2i) -> LegendEntry:
 	if _entries.has(cell):
 		return _entries[cell]
@@ -88,6 +101,7 @@ func overlay_entry_at(cell: Vector2i) -> LegendEntry:
 	return null
 
 
+## Every cell carrying a zone tag.
 func cells_with_tag(tag: StringName) -> Array[Vector2i]:
 	var found: Array[Vector2i] = []
 	for cell: Vector2i in _all_cells():
@@ -96,6 +110,7 @@ func cells_with_tag(tag: StringName) -> Array[Vector2i]:
 	return found
 
 
+## Every cell where an item can rest.
 func storable_cells() -> Array[Vector2i]:
 	var found: Array[Vector2i] = []
 	for cell: Vector2i in _all_cells():
@@ -115,14 +130,17 @@ func overlay_size() -> Vector2i:
 	return _overlay_size
 
 
+## The cells an overlay marks.
 func overlay_cells() -> Array[Vector2i]:
 	return _overlay_entries.keys()
 
 
+## Overlay characters the legend does not list, by cell. Read by LayoutValidator.
 func overlay_unknown_symbols() -> Dictionary[Vector2i, String]:
 	return _overlay_unknown_symbols
 
 
+# Looks up every character of the layout text in the legend.
 func _read_cells(lines: PackedStringArray, legend: LayoutLegend) -> void:
 	_size = _size_of(lines)
 	for row: int in lines.size():
@@ -139,6 +157,7 @@ func _read_cells(lines: PackedStringArray, legend: LayoutLegend) -> void:
 				_entries[cell] = entry
 
 
+# Looks up every mark of the overlay text in the legend.
 func _read_overlay(lines: PackedStringArray, legend: LayoutLegend) -> void:
 	_overlay_size = _size_of(lines)
 	for row: int in lines.size():
@@ -155,6 +174,7 @@ func _read_overlay(lines: PackedStringArray, legend: LayoutLegend) -> void:
 				_overlay_entries[cell] = entry
 
 
+# Every cell of the bounding rectangle, row by row.
 func _all_cells() -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
 	for row: int in _size.y:
@@ -176,6 +196,7 @@ static func _lines_of(text: String) -> PackedStringArray:
 	return lines
 
 
+# The longest line and the number of lines.
 static func _size_of(lines: PackedStringArray) -> Vector2i:
 	var width: int = 0
 	for line: String in lines:

@@ -7,6 +7,10 @@ extends RefCounted
 
 const DEFAULT_TOLERANCE: float = 0.0001
 
+## A node inside the scene tree, set by the runner, for the few tests that
+## have to put a scene in the tree to try it. Such a test frees what it adds.
+var scene_host: Node
+
 var _failures: Array[String] = []
 
 

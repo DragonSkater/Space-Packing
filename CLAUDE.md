@@ -16,7 +16,7 @@ The user owns the game design, the art, and all progression content and balance 
 
 ## Local only
 
-Everything stays on this PC until the user says otherwise. The git repository has no remote: do not add one and do not push. Do not upload a build anywhere. When you serve the browser build to test it, serve it to this machine only.
+Everything stays on this PC until the user says otherwise. The git repository has no remote: do not add one and do not push. Do not upload a build anywhere. When you serve the browser build to test it, serve it to this machine only (`127.0.0.1`). The user also tests the build on their own devices, such as an iPad, over the home network. They run that server themselves, over HTTPS and bound to this PC's local-network address. Do not start a server on any address other than `127.0.0.1`, and never forward a port or open a tunnel to the internet. See "Testing on another device" below.
 
 ## Layers
 
@@ -48,6 +48,16 @@ ui/, debug/  ->  game/  ->  core/        data/ is read by all three
   ```
 
 - Comments explain why, or state a rule from the plan with its section number. Do not narrate what the next line does.
+- Every script in `core/`, `game/`, `ui/` and `debug/` carries a map for the reader, directly under its `extends` line, and every function has a comment above it saying what it does (`##` for a function others call, `#` for a private one). The map lists the files that drive the script, the files it drives, where its numbers live and where its tests are, naming functions as `path/file.gd -> function()`:
+
+  ```gdscript
+  # Where to look
+  #   Shown by:   ui/packing/packing_screen.gd -> _start_round()
+  #   Numbers:    ui/common/presentation_tuning.gd, the Animation group
+  #   Tests:      tests/ui/test_packing_screen.gd
+  ```
+
+  `tests/test_code_maps.gd` fails when a map is missing, when it names a file or function that does not exist, or when a function has no comment. Update the map when you move or rename something. In `core/` a map names only files in `core/`, `data/tuning/` and `tests/`, so the engine stays portable.
 
 ## Scenes and resources
 
@@ -81,6 +91,19 @@ Notes on these commands, found on 4.7.2:
 - The import and test commands do not print GDScript warnings: the engine sends those only to an attached editor. The last command is how to check for them. It works on a temporary copy and changes nothing in the project.
 - The Web preset leaves `addons/`, `tests/`, `docs/` and `screens/` out of the build (`exclude_filter` in `export_presets.cfg`). The unused Dialogue Manager addon has C# files this engine build cannot load, and exporting them printed errors. If the addon is given a role (PLAN.md, D13), take `addons/*` out of that filter.
 - `Builds/` holds a `.gdignore` so the engine does not import its own export output.
+
+### Testing on another device
+
+The user's own server publishes `Builds/web/` to their devices on the home network. To get a change onto those devices, export again with the command above. Do not restart the server: it reads the files from disk. The user then reloads the page on the device.
+
+What keeps this working:
+
+- **HTTPS is required.** The engine refuses to start outside a secure context: `Space-Packing.js -> getMissingFeatures()` reports "Secure Context". Browsers treat `127.0.0.1` as secure, but a LAN address over plain `http://` is not. The certificate comes from the user's mkcert setup, and each device trusts mkcert's root CA.
+- **Keep `variant/thread_support=false`** in the Web preset. With threads on, the build also needs cross-origin isolation headers, which a plain static server does not send.
+- **Keep `progressive_web_app/enabled=false`.** With it on, a service worker caches the build, and reloading shows the old version.
+- **Stale reloads.** If a device still shows the old build after a reload, the browser has cached `Space-Packing.pck` or `.wasm`. The server should send `Cache-Control: no-cache`. Otherwise, clear the site's data on the device.
+- **Certificates and keys never enter the repository.** `.gitignore` excludes `*.pem` and `*.key`.
+- Python 3.13, the version on this PC, has no TLS option in `http.server`. Version 3.14 adds `--tls-cert` and `--tls-key`.
 
 Milestone 0 creates the test runner. If one of these commands does not behave as described on 4.7.2, fix the command in this file as part of your work and say so.
 

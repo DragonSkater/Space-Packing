@@ -1,0 +1,65 @@
+[gd_resource type="Resource" script_class="PackingScenario" format=3]
+
+[ext_resource type="Script" path="res://core/packing/packing_scenario.gd" id="1_scenario"]
+[ext_resource type="Script" path="res://core/packing/batch.gd" id="2_batch"]
+[ext_resource type="Resource" path="res://data/legends/example_legend.tres" id="8_legend"]
+[ext_resource type="Resource" path="res://data/cargo/example_beam.tres" id="4_beam"]
+[ext_resource type="Resource" path="res://data/cargo/example_block.tres" id="6_block"]
+[ext_resource type="Resource" path="res://data/cargo/example_crate.tres" id="3_crate"]
+[ext_resource type="Resource" path="res://data/cargo/example_elbow.tres" id="5_elbow"]
+[ext_resource type="Resource" path="res://data/cargo/example_rail.tres" id="7_rail"]
+
+[sub_resource type="Resource" id="batch_1"]
+script = ExtResource("2_batch")
+item_type = ExtResource("4_beam")
+count = 1
+required = true
+
+[sub_resource type="Resource" id="batch_2"]
+script = ExtResource("2_batch")
+item_type = ExtResource("6_block")
+count = 1
+required = true
+
+[sub_resource type="Resource" id="batch_3"]
+script = ExtResource("2_batch")
+item_type = ExtResource("3_crate")
+count = 2
+required = true
+
+[sub_resource type="Resource" id="batch_4"]
+script = ExtResource("2_batch")
+item_type = ExtResource("5_elbow")
+count = 1
+required = true
+
+[sub_resource type="Resource" id="batch_5"]
+script = ExtResource("2_batch")
+item_type = ExtResource("7_rail")
+count = 1
+required = true
+
+[sub_resource type="Resource" id="batch_6"]
+script = ExtResource("2_batch")
+item_type = ExtResource("3_crate")
+count = 2
+required = false
+
+[resource]
+script = ExtResource("1_scenario")
+display_name = "Example 2: bulkhead and both sides"
+layout_text = "#######
+D..|..D
+#.....#
+D.....#
+D.....#
+#EEEEE#"
+designation_text = ".......
+.......
+.......
+....GG.
+....GG.
+......."
+legend = ExtResource("8_legend")
+manifest = Array[ExtResource("2_batch")]([SubResource("batch_1"), SubResource("batch_2"), SubResource("batch_3"), SubResource("batch_4"), SubResource("batch_5"), SubResource("batch_6")])
+move_limit = 16

@@ -4,6 +4,11 @@
 class_name ShiftRange
 extends RefCounted
 
+# Where to look
+#   Made by:    core/packing/access_solver.gd -> shift_range()
+#   Used by:    core/packing/packing_session.gd -> shift(), unload()
+#   Tests:      tests/core/test_access_solver.gd
+
 ## Origins where the item can be left, not including where it already is.
 ## Those to the left come first, each side listed nearest first.
 var stops: Array[Vector2i] = []
@@ -12,9 +17,11 @@ var stops: Array[Vector2i] = []
 var exits: Array[Vector2i] = []
 
 
+## True when the item can be left at this origin.
 func has_stop(origin: Vector2i) -> bool:
 	return stops.has(origin)
 
 
+## True when the item can slide out on this side.
 func can_leave(direction: Vector2i) -> bool:
 	return exits.has(direction)

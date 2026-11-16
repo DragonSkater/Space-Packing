@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PackingTuning" format=3]
+
+[ext_resource type="Script" path="res://core/packing/packing_tuning.gd" id="1_tuning"]
+
+[resource]
+script = ExtResource("1_tuning")
+default_move_limit = 12
+push_in_cost = 1
+shift_cost = 1
+turn_cost = 1
+held_turn_cost = 1
+unload_cost = 1
+stack_pick_depth = 1

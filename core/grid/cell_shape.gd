@@ -5,6 +5,12 @@
 class_name CellShape
 extends Resource
 
+# Where to look
+#   Used by:    core/packing/pack_item_type.gd -> shape()
+#               core/packing/pack_item.gd -> cells()
+#               core/packing/access_solver.gd -> turn_option()
+#   Tests:      tests/core/test_cell_shape.gd
+
 const FILLED_SYMBOL: String = "X"
 const NEIGHBOUR_STEPS: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 
@@ -50,6 +56,7 @@ func rotated_clockwise() -> CellShape:
 	return from_cells(turned)
 
 
+## A quarter turn anticlockwise as seen on screen.
 func rotated_anticlockwise() -> CellShape:
 	var turned: Array[Vector2i] = []
 	for cell: Vector2i in cells:
@@ -74,6 +81,7 @@ func is_one_piece() -> bool:
 	return reached.size() == cells.size()
 
 
+## The smallest rectangle of cells that holds every cell of the shape.
 func bounds() -> Rect2i:
 	if cells.is_empty():
 		return Rect2i()
@@ -93,5 +101,6 @@ func cells_at(origin: Vector2i) -> Array[Vector2i]:
 	return placed
 
 
+## True when both shapes cover the same cells, wherever each was drawn.
 func matches(other: CellShape) -> bool:
 	return normalised().cells == other.normalised().cells

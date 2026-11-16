@@ -67,6 +67,7 @@ func _run_file(path: String) -> void:
 func _run_method(path: String, script: GDScript, method_name: String) -> void:
 	# A fresh instance per method, so that no test can lean on another.
 	var test: TestCase = script.new() as TestCase
+	test.scene_host = self
 	test.call(method_name)
 	_tests_run += 1
 	for message: String in test.failures():

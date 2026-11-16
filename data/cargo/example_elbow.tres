@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PackItemType" format=3]
+
+[ext_resource type="Script" path="res://core/packing/pack_item_type.gd" id="1_type"]
+
+[resource]
+script = ExtResource("1_type")
+id = &"example_elbow"
+display_name = "Elbow"
+tags = Array[StringName]([])
+shape_text = "X
+XX"
+can_rotate = true
+weight = 3.0
+base_value = 250.0
+colour = Color(0.84, 0.48, 0.62, 1)

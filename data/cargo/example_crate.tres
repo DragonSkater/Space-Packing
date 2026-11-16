@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PackItemType" format=3]
+
+[ext_resource type="Script" path="res://core/packing/pack_item_type.gd" id="1_type"]
+
+[resource]
+script = ExtResource("1_type")
+id = &"example_crate"
+display_name = "Crate"
+tags = Array[StringName]([])
+shape_text = "X"
+can_rotate = true
+weight = 1.0
+base_value = 100.0
+colour = Color(0.86, 0.71, 0.36, 1)

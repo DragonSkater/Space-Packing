@@ -49,6 +49,83 @@ func test_each_action_deducts_its_own_cost() -> void:
 	assert_eq(session.moves_used(), 15)
 
 
+func test_every_spend_names_its_action_and_cost_is_read_from_the_tuning() -> void:
+	var tuning: PackingTuning = PackingTuning.new()
+	tuning.held_turn_cost = 4
+	tuning.shift_cost = 2
+	var session: PackingSession = _session_of_singles_and_a_pair(30, tuning)
+	var spent: Array[String] = []
+	session.moves_spent.connect(func(action: StringName, cost: int) -> void: spent.append("%s %d" % [action, cost]))
+	session.pick_from_stack(0)
+	session.turn_held(true)
+	session.push_in(session.entry_lanes()[0], 1)
+	var item: PackItem = session.state().items()[0]
+	session.shift(item.id, Vector2i(3, 1))
+	session.unload(item.id, Vector2i.LEFT)
+	assert_eq(spent, ["held_turn 4", "push_in 1", "shift 2", "unload 1"] as Array[String], "picking spends nothing")
+	assert_eq(session.cost_of(PackingSession.ACTION_SHIFT), 2)
+	tuning.shift_cost = 5
+	assert_eq(session.cost_of(PackingSession.ACTION_SHIFT), 5, "read when asked")
+	assert_eq(session.cost_of(&"not_an_action"), 0)
+
+
+func test_a_turn_that_leaves_an_item_on_the_same_cells_is_free() -> void:
+	var manifest: Array[Batch] = [
+		CoreFixtures.batch(CoreFixtures.item_type("X"), 1),
+		CoreFixtures.batch(CoreFixtures.item_type("XX
+XX"), 1),
+		CoreFixtures.batch(CoreFixtures.item_type("XX"), 1),
+	]
+	var session: PackingSession = _watched(CoreFixtures.session(ROWS, manifest, 10))
+	var spent: Array[StringName] = []
+	session.moves_spent.connect(func(action: StringName, _cost: int) -> void: spent.append(action))
+	session.pick_from_stack(0)
+	assert_true(session.turn_held(true), "a single item on the loader")
+	assert_eq(session.held().quarter_turns, 1, "its picture still turns")
+	session.push_in(session.entry_lanes()[0], 0)
+	var single: PackItem = session.state().items()[0]
+	assert_true(session.turn(single.id, single.origin, false), "a single item in the container")
+	session.pick_from_stack(0)
+	assert_true(session.turn_held(true), "a square on the loader")
+	assert_eq(session.moves_left(), 9, "only the load was paid for")
+	assert_eq(spent, [PackingSession.ACTION_PUSH_IN] as Array[StringName], "a free turn says nothing")
+
+
+func test_a_turn_that_moves_any_cell_costs_its_full_price() -> void:
+	var manifest: Array[Batch] = [CoreFixtures.batch(CoreFixtures.item_type("XX"), 1)]
+	var session: PackingSession = _watched(CoreFixtures.session(ROWS, manifest, 10))
+	session.pick_from_stack(0)
+	session.turn_held(true)
+	assert_eq(session.moves_left(), 9)
+
+
+func test_free_turns_can_be_switched_off() -> void:
+	var tuning: PackingTuning = PackingTuning.new()
+	tuning.free_turn_when_unchanged = false
+	var session: PackingSession = _session_of_singles_and_a_pair(10, tuning)
+	session.pick_from_stack(0)
+	session.push_in(session.entry_lanes()[0], 0)
+	session.pick_from_stack(0)
+	session.turn_held(true)
+	assert_eq(session.moves_left(), 8, "the pair's load and the single's turn are both paid for")
+
+
+func test_the_bottom_of_the_stack_can_be_taken_only_when_the_round_allows_it() -> void:
+	var session: PackingSession = _session_of_singles_and_a_pair(10, PackingTuning.new())
+	var bottom: PackItem = session.stack()[3]
+	assert_true(not session.can_pick(3))
+	assert_true(not session.pick_from_stack(3), "out of reach by default")
+	session.set_stack_bottom_reachable(true)
+	assert_true(session.stack_reachable(0) and session.stack_reachable(3))
+	assert_true(not session.stack_reachable(2), "the middle stays out of reach")
+	assert_true(session.pick_from_stack(3))
+	assert_true(session.held() == bottom)
+	assert_true(not session.can_pick(0), "nothing can be taken while the loader is full")
+	assert_true(session.stack_reachable(0), "though the top is still within reach")
+	session.put_back()
+	assert_true(session.stack()[0] == bottom, "put back, it goes on top")
+
+
 func test_a_shift_costs_the_same_whatever_the_distance() -> void:
 	var session: PackingSession = _session_with_one_single_loaded(10)
 	var item: PackItem = session.state().items()[0]
@@ -76,9 +153,9 @@ func test_an_action_is_refused_when_no_moves_are_left() -> void:
 	assert_true(not session.shift(item.id, Vector2i(2, 1)), "a shift")
 	session.pick_from_stack(0)
 	assert_true(not session.push_in(session.entry_lanes()[0], 0), "a push in")
-	assert_true(not session.turn_held(true), "a turn on the loader")
 	assert_true(session.held() != null, "the item is still on the loader")
-	assert_eq(_refusals, [PackingSession.REFUSED_NO_MOVES, PackingSession.REFUSED_NO_MOVES, PackingSession.REFUSED_NO_MOVES] as Array[StringName])
+	assert_true(session.turn_held(true), "turning a single item changes nothing, so it is free even now")
+	assert_eq(_refusals, [PackingSession.REFUSED_NO_MOVES, PackingSession.REFUSED_NO_MOVES] as Array[StringName])
 	assert_eq(session.moves_left(), 0)
 
 

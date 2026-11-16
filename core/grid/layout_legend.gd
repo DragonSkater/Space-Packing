@@ -4,6 +4,11 @@
 class_name LayoutLegend
 extends Resource
 
+# Where to look
+#   Entries:    core/grid/legend_entry.gd
+#   Used by:    core/grid/container_layout.gd -> parse()
+#   Tests:      tests/core/test_container_layout.gd
+
 @export var entries: Array[LegendEntry] = []
 
 
