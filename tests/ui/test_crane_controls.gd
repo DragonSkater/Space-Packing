@@ -243,6 +243,32 @@ X"])
 	assert_true(controls.active_item() == session.held())
 
 
+func test_a_piece_dropped_on_a_dimmed_door_is_held_by_that_door_s_crane() -> void:
+	var session: PackingSession = _session(["X", "X"])
+	var controls: CraneControls = _controls(session)
+	_load(controls, session, 3, 1)
+	controls.begin_carry(0, STACK_POINT)
+	controls.carry_to(Vector2(-0.5, 3.5), null, true)
+	assert_eq(controls.carry_origin(), Vector2(-1.0, 3.0), "over the bottom door it settles outside it")
+	assert_eq(controls.carry_doors(), [Vector2i(0, 3)] as Array[Vector2i], "that door is the drop target")
+	controls.end_carry()
+	assert_true(session.held() != null, "the crane took it, though that door is blocked")
+	assert_true(controls.held_lane() == null)
+	assert_eq(controls.held_origin(), Vector2(-1.0, 3.0))
+	assert_eq(controls.held_doors(), [Vector2i(0, 3)] as Array[Vector2i], "the bottom door's arm holds it")
+
+
+func test_the_arms_holding_a_piece_are_its_lane_s_doors_or_the_doors_it_waits_beside() -> void:
+	var session: PackingSession = _session(["X", "X\nX\nX\nX"])
+	var controls: CraneControls = _controls(session)
+	controls.tap_stack(0, STACK_POINT)
+	assert_eq(controls.held_doors(), controls.held_lane().door_cells, "at a lit door, that door's arm")
+	_load(controls, session, 1, 1)
+	controls.tap_stack(0, STACK_POINT)
+	var three_doors: Array[Vector2i] = [Vector2i(0, 1), Vector2i(0, 2), Vector2i(0, 3)]
+	assert_eq(controls.held_doors(), three_doors, "no door takes the rod; the arms it waits beside hold it")
+
+
 func test_the_crane_waits_with_the_next_piece_while_a_loaded_one_is_worked() -> void:
 	var session: PackingSession = _session(["X", "X"])
 	var controls: CraneControls = _controls(session)

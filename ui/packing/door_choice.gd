@@ -7,7 +7,8 @@ class_name DoorChoice
 extends RefCounted
 
 # Where to look
-#   Used by:    ui/packing/crane_controls.gd -> fetch(), tap_stack(), turn(), held_origin()
+#   Used by:    ui/packing/crane_controls.gd -> fetch(), tap_stack(), turn(), held_origin(), held_doors(),
+#               carry_origin(), carry_doors()
 #   Lanes from: core/packing/packing_session.gd -> entry_lanes()
 #   Doors from: ui/packing/gantry_view.gd -> entrance_doors()
 #   Tests:      tests/ui/test_crane_controls.gd
@@ -59,3 +60,17 @@ static func waiting_origin(layout: ContainerLayout, item: PackItem, point: Vecto
 				chosen = origin
 				chosen_distance = distance
 	return chosen
+
+
+## The doors a piece waiting at this origin sits beside: on the side it
+## waits on, in the rows it covers. Their crane arms are the ones holding it.
+static func doors_beside(layout: ContainerLayout, item: PackItem, origin: Vector2i) -> Array[Vector2i]:
+	var side: Vector2i = Vector2i.RIGHT
+	if origin.x < 0:
+		side = Vector2i.LEFT
+	var height: int = item.shape.bounds().size.y
+	var beside: Array[Vector2i] = []
+	for door: Vector2i in GantryView.entrance_doors(layout, side):
+		if door.y >= origin.y and door.y < origin.y + height:
+			beside.append(door)
+	return beside

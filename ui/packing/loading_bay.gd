@@ -15,8 +15,9 @@ extends Control
 #               grab_cell(), grab_held(), begin_carry(), carry_to(), end_carry(), begin_slide(), slide_by(),
 #               end_slide(), turn(), wants_fetch(), fetch()
 #   Numbers:    ui/common/presentation_tuning.gd, the Crane group
-#   Its parts:  ui/packing/stack_view.gd -> pick_index_at(), slot_point(), ui/common/grid_view.gd, ui/packing/gantry_view.gd,
-#               ui/packing/item_layer.gd
+#   Its parts:  ui/packing/stack_view.gd -> pick_index_at(), slot_point(), ui/common/grid_view.gd,
+#               ui/packing/gantry_view.gd -> lane_at(), is_on_an_arm(),
+#               ui/packing/item_layer.gd, ui/packing/crane_grip_view.gd
 
 const SIDES: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT]
 
@@ -39,6 +40,7 @@ var _idle_seconds: float = 0.0
 @onready var _grid: GridView = %GridView
 @onready var _gantry: GantryView = %GantryView
 @onready var _items: ItemLayer = %ItemLayer
+@onready var _grip: CraneGripView = %CraneGripView
 
 
 ## Shows a new round in every part. Called by PackingScreen._start_round.
@@ -61,6 +63,7 @@ func show_round(session: PackingSession, controls: CraneControls, tuning: Presen
 	_stack_view.show_round(session, controls, tuning, widest)
 	_gantry.show_round(_grid, session, controls, tuning)
 	_items.show_round(_grid, session, controls, tuning)
+	_grip.show_round(_grid, session, controls, tuning)
 	_warn_if_cramped.call_deferred()
 
 
@@ -134,7 +137,7 @@ func _on_drag_started(at: Vector2, axis: GestureReader.Axis) -> void:
 func _on_drag_moved(offset: Vector2) -> void:
 	if _carrying:
 		var point: Vector2 = _carry_point()
-		_controls.carry_to(point, _gantry.lane_at(point))
+		_controls.carry_to(point, _gantry.lane_at(point), _gantry.is_on_an_arm(point))
 		return
 	if _slide_pending:
 		_slide_pending = false

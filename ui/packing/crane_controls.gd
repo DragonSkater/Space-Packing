@@ -39,6 +39,11 @@ var _stack_point: Vector2 = Vector2.ZERO
 var _carrying: bool = false
 var _carry_point: Vector2 = Vector2.ZERO
 var _carry_lane: EntryLane = null
+# While carried: true when the finger is over a door's arm, lit or dimmed.
+var _carry_over_door: bool = false
+# A held piece that no door will take waits outside the door nearest this
+# point, in cells: the stack it came from, or the door it was dropped on.
+var _wait_point: Vector2 = Vector2.ZERO
 # The player put the crane's piece back by hand, so the crane waits for
 # them instead of fetching it again.
 var _fetch_paused: bool = false
@@ -84,7 +89,20 @@ func held_origin() -> Vector2:
 		return Vector2.ZERO
 	if _lane != null:
 		return Vector2(_lane.hold_origin)
-	return Vector2(DoorChoice.waiting_origin(_session.state().layout, held, _stack_point))
+	return Vector2(DoorChoice.waiting_origin(_session.state().layout, held, _wait_point))
+
+
+## The door cells whose crane arms hold the held piece: its lane's doors,
+## or, when no door will take it, the doors it waits beside. Empty while
+## the finger carries it or the crane is empty. GantryView draws these arms
+## as holding it.
+func held_doors() -> Array[Vector2i]:
+	var held: PackItem = _session.held()
+	if held == null or _carrying:
+		return []
+	if _lane != null:
+		return _lane.door_cells
+	return DoorChoice.doors_beside(_session.state().layout, held, Vector2i(held_origin()))
 
 
 ## The slide in progress, or null. ItemLayer draws the piece where it says.
@@ -112,6 +130,34 @@ func carry_lane() -> EntryLane:
 	return _carry_lane
 
 
+## Where the carried piece is shown, as the origin of its top-left corner in
+## cells. Over a door it settles where it would wait there, lit door or
+## dimmed, so the player sees which crane letting go hands it to; anywhere
+## else it is under the finger.
+func carry_origin() -> Vector2:
+	var held: PackItem = _session.held()
+	if held == null:
+		return _carry_point
+	if _carry_lane != null:
+		return Vector2(_carry_lane.hold_origin)
+	if _carry_over_door:
+		return Vector2(DoorChoice.waiting_origin(_session.state().layout, held, _carry_point))
+	return _carry_point - Vector2(held.shape.bounds().size) / 2.0
+
+
+## The door cells the carried piece would be handed to if the finger lifted
+## now: those of the door under it, lit or dimmed. Empty anywhere else.
+func carry_doors() -> Array[Vector2i]:
+	var held: PackItem = _session.held()
+	if held == null or not _carrying:
+		return []
+	if _carry_lane != null:
+		return _carry_lane.door_cells
+	if _carry_over_door:
+		return DoorChoice.doors_beside(_session.state().layout, held, Vector2i(carry_origin()))
+	return []
+
+
 ## True when the crane is empty, the stack is not, and the player has not
 ## put a piece back by hand. LoadingBay then has the crane fetch the top piece.
 func wants_fetch() -> bool:
@@ -122,6 +168,7 @@ func wants_fetch() -> bool:
 ## Free, like any pick.
 func fetch(stack_point_cells: Vector2) -> void:
 	_stack_point = stack_point_cells
+	_wait_point = stack_point_cells
 	if _session.pick_from_stack(0):
 		_lane = DoorChoice.nearest(_session.entry_lanes(), _session.held(), _stack_point)
 	view_changed.emit()
@@ -139,6 +186,7 @@ func tap_stack(index_from_top: int, stack_point_cells: Vector2) -> void:
 		return
 	if _session.pick_from_stack(index_from_top):
 		_fetch_paused = false
+		_wait_point = stack_point_cells
 		_lane = DoorChoice.nearest(_session.entry_lanes(), _session.held(), _stack_point)
 	view_changed.emit()
 
@@ -205,30 +253,40 @@ func begin_carry(index_from_top: int, stack_point_cells: Vector2) -> bool:
 	_carrying = true
 	_carry_point = stack_point_cells
 	_carry_lane = null
+	_carry_over_door = false
 	view_changed.emit()
 	return true
 
 
 ## The finger moved: the carried piece is under it, over a door or not.
-func carry_to(point_cells: Vector2, lane_under: EntryLane) -> void:
+## lane_under is the lit door under it; over_a_door is true over any door's
+## arm, lit or dimmed.
+func carry_to(point_cells: Vector2, lane_under: EntryLane, over_a_door: bool = false) -> void:
 	if not _carrying:
 		return
 	_carry_point = point_cells
 	_carry_lane = lane_under
+	_carry_over_door = over_a_door or lane_under != null
 	view_changed.emit()
 
 
-## The finger lifted. Over a door, the crane takes the piece there; anywhere
-## else it goes back on the stack, and the crane waits.
+## The finger lifted. Over a lit door, the crane takes the piece there. Over
+## a dimmed one, that door's crane holds it outside, where it can be turned
+## until a door will take it. Anywhere else it goes back on the stack, and
+## the crane waits.
 func end_carry() -> void:
 	if not _carrying:
 		return
 	_carrying = false
 	if _carry_lane != null:
 		_lane = _carry_lane
+	elif _carry_over_door:
+		_lane = null
+		_wait_point = _carry_point
 	else:
 		_put_back_held()
 	_carry_lane = null
+	_carry_over_door = false
 	view_changed.emit()
 
 
