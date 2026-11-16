@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShipType" format=3]
+
+[ext_resource type="Script" path="res://game/ships/ship_type.gd" id="1_ship"]
+[ext_resource type="Resource" path="res://data/legends/example_legend.tres" id="2_legend"]
+
+[resource]
+script = ExtResource("1_ship")
+id = &"example_ship_2"
+display_name = "Example ship 2"
+description = "Placeholder ship: a hold of 4 by 3 cargo spots (12), loaded through doors on the left. The grid is a starter for the designer to redraw."
+hull_layout_text = "######
+D....#
+D....#
+D....#
+#EEEE#"
+legend = ExtResource("2_legend")

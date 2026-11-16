@@ -30,6 +30,13 @@ func test_the_catalog_finds_the_example_legend() -> void:
 	assert_true(legends[0].entry_for("D") != null, "with an entry for a door")
 
 
+func test_the_catalog_finds_the_example_ships_in_file_name_order() -> void:
+	var ships: Array[ShipType] = Catalog.ships()
+	assert_true(ships.size() >= 2, "both example ships")
+	assert_eq(ships[0].resource_path.get_file(), "example_ship_1.tres")
+	assert_eq(ships[1].resource_path.get_file(), "example_ship_2.tres")
+
+
 func test_a_folder_holds_only_resources_and_an_unknown_folder_is_empty() -> void:
 	assert_eq(Catalog.in_folder("scenarios").size(), Catalog.scenarios().size(), "the README is not content")
 	assert_eq(Catalog.in_folder("no_such_folder"), [] as Array[Resource])

@@ -10,6 +10,7 @@ extends Control
 #   Screens:    ui/overview/overview_screen.gd -> refresh()
 #               ui/packing/packing_screen.gd -> open_scenario()
 #               ui/reports/launch_screen.gd -> show_load()
+#   Rounds:     game/launch/scheduled_launch.gd -> round_in()
 #   Keeps:      game/app/game_state.gd -> record_launch()
 #   Tests:      tests/ui/test_boot.gd
 
@@ -39,16 +40,20 @@ func _show_overview() -> void:
 	_show_only(_overview)
 
 
-# A fresh round of the chosen launch.
-func _open_packing(scheduled: ScheduledLaunch) -> void:
-	if scheduled.scenario == null:
-		push_error("Boot: %s has no scenario to pack." % scheduled.display_name)
+# A fresh round of the chosen launch, in the chosen ship. ship is null
+# when the launch brings its own hull.
+func _open_packing(scheduled: ScheduledLaunch, ship: ShipType) -> void:
+	for problem: String in scheduled.problems():
+		push_error("%s: %s" % [scheduled.display_name, problem])
+	var packing_round: PackingScenario = scheduled.round_in(ship)
+	if packing_round == null:
+		push_error("Boot: %s has no scenario and no ship to pack." % scheduled.display_name)
 		return
 	_scheduled = scheduled
 	# Shown first: a hidden container is not laid out, and the round sizes
 	# its grid from the space it is given.
 	_show_only(_packing)
-	_packing.open_scenario(scheduled.scenario)
+	_packing.open_scenario(packing_round)
 
 
 # Done was pressed: show the load before it launches. The packing round is

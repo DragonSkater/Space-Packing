@@ -1,9 +1,9 @@
 ## The overview, which is also the contract screen (PLAN.md section 2): the
 ## map with the launched ships on it, a list of launched ships, each with a
 ## picture of how it was packed, and the upcoming launches, which are
-## placeholders until the contracts of milestone 6. It reads GameState and
-## Catalog and redraws when a launch is recorded; choosing a launch only
-## reports it, and whoever opened the screen starts the round.
+## placeholders until the contracts of milestone 6. A launch that leaves the
+## ship to the player opens the ship picker first. It reads GameState and
+## Catalog; choosing only reports, and whoever opened the screen starts it.
 class_name OverviewScreen
 extends Control
 
@@ -11,13 +11,15 @@ extends Control
 #   Scene:      ui/overview/overview_screen.tscn
 #   Opened by:  ui/boot/boot.gd -> _show_overview()
 #   Reads:      game/app/game_state.gd -> launches(), is_open(), is_fulfilled(), times_flown()
-#               game/app/catalog.gd -> space_maps(), scheduled_launches()
-#   Its parts:  ui/overview/space_map_view.gd, ui/overview/launched_row.gd, ui/overview/upcoming_row.gd
+#               game/app/catalog.gd -> space_maps(), scheduled_launches(), ships()
+#   Its parts:  ui/overview/space_map_view.gd, ui/overview/launched_row.gd, ui/overview/upcoming_row.gd,
+#               ui/overview/ship_picker.gd -> offer()
 #   Numbers:    ui/common/presentation_tuning.gd, the Overview and Screen margins groups
-#   Tests:      tests/ui/test_overview_screen.gd
+#   Tests:      tests/ui/test_overview_screen.gd, tests/ui/test_ship_picker.gd
 
-## The player chose an upcoming launch to pack.
-signal launch_chosen(scheduled: ScheduledLaunch)
+## The player chose an upcoming launch to pack, and the ship to pack it in.
+## ship is null when the launch brings its own hull (a ready-made scenario).
+signal launch_chosen(scheduled: ScheduledLaunch, ship: ShipType)
 
 const LAUNCHED_ROW: PackedScene = preload("res://ui/overview/launched_row.tscn")
 const UPCOMING_ROW: PackedScene = preload("res://ui/overview/upcoming_row.tscn")
@@ -30,6 +32,7 @@ const COUNT_TEXT: String = "Launches so far: %d"
 @onready var _no_launches: Label = %NoLaunches
 @onready var _upcoming_list: VBoxContainer = %UpcomingList
 @onready var _nothing_scheduled: Label = %NothingScheduled
+@onready var _ship_picker: ShipPicker = %ShipPicker
 
 
 # Applies the margins, and redraws whenever a launch is recorded.
@@ -40,12 +43,15 @@ func _ready() -> void:
 	_margins.add_theme_constant_override("margin_left", roundi(tuning.edge_guard))
 	_margins.add_theme_constant_override("margin_right", roundi(tuning.edge_guard))
 	GameState.launch_recorded.connect(_on_launch_recorded)
+	_ship_picker.ship_chosen.connect(_on_ship_chosen)
+	_ship_picker.cancelled.connect(_ship_picker.close)
 	_redraw()
 
 
 ## Brings everything on the screen up to date. Called by Boot each time the
-## overview is shown.
+## overview is shown. A ship picker left open is closed.
 func refresh() -> void:
+	_ship_picker.close()
 	_redraw()
 
 
@@ -90,7 +96,26 @@ func _fill_upcoming(tuning: PresentationTuning) -> void:
 		_upcoming_list.add_child(row)
 		var open: bool = GameState.is_open(scheduled)
 		row.show_launch(scheduled, open, GameState.is_fulfilled(scheduled), GameState.times_flown(scheduled), tuning)
-		row.chosen.connect(launch_chosen.emit)
+		row.chosen.connect(_on_upcoming_chosen)
+
+
+# A launch was tapped. When the player picks the ship, the picker opens
+# with every ship that can fly it; otherwise the launch goes straight on.
+func _on_upcoming_chosen(scheduled: ScheduledLaunch) -> void:
+	if not scheduled.chooses_ship():
+		launch_chosen.emit(scheduled, scheduled.ship)
+		return
+	var offered: Array[ShipType] = []
+	for ship: ShipType in Catalog.ships():
+		if scheduled.can_fly_in(ship):
+			offered.append(ship)
+	_ship_picker.offer(scheduled, offered, PresentationTuning.current())
+
+
+# A ship was picked in the picker: the launch goes on in it.
+func _on_ship_chosen(scheduled: ScheduledLaunch, ship: ShipType) -> void:
+	_ship_picker.close()
+	launch_chosen.emit(scheduled, ship)
 
 
 # Rows are rebuilt on every redraw; there are only a handful.

@@ -47,7 +47,7 @@ func test_tapping_an_open_launch_reports_it() -> void:
 	GameState.clear_launches()
 	var screen: OverviewScreen = _open_screen()
 	var chosen: Array[ScheduledLaunch] = []
-	screen.launch_chosen.connect(chosen.append)
+	screen.launch_chosen.connect(func(scheduled: ScheduledLaunch, _ship: ShipType) -> void: chosen.append(scheduled))
 	_upcoming_rows(screen)[0].pressed.emit()
 	assert_eq(chosen.size(), 1)
 	assert_true(chosen[0] == Catalog.scheduled_launches()[0])

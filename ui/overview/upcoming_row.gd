@@ -1,14 +1,14 @@
 ## One line in the overview's list of upcoming launches: its name, where
 ## it goes, and whether it can be flown. Tapping an open one reports it as
-## chosen. Whether it is open is decided by GameState and handed in; this
-## row only shows it. The launches are placeholders for milestone 6.
+## chosen, and says so when the player will pick the ship. Whether it is
+## open is decided by GameState and handed in; this row only shows it.
 class_name UpcomingRow
 extends Button
 
 # Where to look
 #   Scene:      ui/overview/upcoming_row.tscn
 #   Made by:    ui/overview/overview_screen.gd -> _fill_upcoming()
-#   Shows:      game/launch/scheduled_launch.gd
+#   Shows:      game/launch/scheduled_launch.gd -> chooses_ship(), cargo_spots_needed()
 #   Open from:  game/app/game_state.gd -> is_open(), is_fulfilled(), times_flown()
 #   Tests:      tests/ui/test_overview_screen.gd
 
@@ -23,6 +23,7 @@ const MISSED_TEXT: String = "Flown %s, required cargo missed. Tap to try again."
 const ONCE_TEXT: String = "once"
 const TIMES_TEXT: String = "%d times"
 const WAITING_TEXT: String = "Waiting: fly %s first, with everything required."
+const PICK_SHIP_TEXT: String = " %d spots of cargo; pick a ship."
 
 var _scheduled: ScheduledLaunch
 
@@ -55,6 +56,8 @@ func show_launch(scheduled: ScheduledLaunch, open: bool, fulfilled: bool, times_
 	else:
 		_status.text = MISSED_TEXT % _how_often(times_flown)
 		_status.modulate = tuning.attention_colour
+	if open and scheduled.chooses_ship():
+		_status.text += PICK_SHIP_TEXT % scheduled.cargo_spots_needed()
 
 
 ## The launch this row stands for.

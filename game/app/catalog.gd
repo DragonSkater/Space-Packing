@@ -7,8 +7,8 @@ extends Node
 # Where to look
 #   Reads:      every .tres in the folders of data/, except data/tuning/
 #   Kinds:      core/packing/packing_scenario.gd, core/packing/pack_item_type.gd, core/grid/layout_legend.gd,
-#               game/space/space_map.gd, game/launch/scheduled_launch.gd
-#   Used by:    ui/overview/overview_screen.gd -> _redraw()
+#               game/space/space_map.gd, game/launch/scheduled_launch.gd, game/ships/ship_type.gd
+#   Used by:    ui/overview/overview_screen.gd -> _redraw(), _on_upcoming_chosen()
 #   Registered: project.godot, under [autoload]
 #   Tests:      tests/game/test_catalog.gd, tests/data/test_example_data.gd
 
@@ -18,6 +18,7 @@ const ITEM_TYPES_FOLDER: String = "cargo"
 const LEGENDS_FOLDER: String = "legends"
 const MAPS_FOLDER: String = "maps"
 const LAUNCHES_FOLDER: String = "launches"
+const SHIPS_FOLDER: String = "ships"
 # The Tuning autoload loads this folder itself.
 const SKIPPED_FOLDERS: Array[String] = ["tuning"]
 const FOLDER_SUFFIX: String = "/"
@@ -93,6 +94,16 @@ func scheduled_launches() -> Array[ScheduledLaunch]:
 	var found: Array[ScheduledLaunch] = []
 	for resource: Resource in in_folder(LAUNCHES_FOLDER):
 		if resource is ScheduledLaunch:
+			found.append(resource)
+	return found
+
+
+## The ship types in data/ships/, in file-name order, which is the order
+## the overview offers them in.
+func ships() -> Array[ShipType]:
+	var found: Array[ShipType] = []
+	for resource: Resource in in_folder(SHIPS_FOLDER):
+		if resource is ShipType:
 			found.append(resource)
 	return found
 

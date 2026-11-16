@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://ui/overview/overview_screen.gd" id="1_screen"]
 [ext_resource type="Script" path="res://ui/overview/space_map_view.gd" id="2_map"]
+[ext_resource type="Script" path="res://ui/overview/ship_picker.gd" id="3_picker"]
 
 [node name="OverviewScreen" type="Control"]
 layout_mode = 3
@@ -116,3 +117,76 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "No launches scheduled: data/launches/ is empty."
 autowrap_mode = 3
+
+[node name="ShipPicker" type="Control" parent="Column"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_picker")
+
+[node name="Backdrop" type="ColorRect" parent="Column/ShipPicker"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.09, 0.13, 1)
+
+[node name="Margins" type="MarginContainer" parent="Column/ShipPicker"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 32
+
+[node name="Rows" type="VBoxContainer" parent="Column/ShipPicker/Margins"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Column/ShipPicker/Margins/Rows"]
+layout_mode = 2
+text = "PICK A SHIP"
+horizontal_alignment = 1
+
+[node name="Need" type="Label" parent="Column/ShipPicker/Margins/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="ShipScroll" type="ScrollContainer" parent="Column/ShipPicker/Margins/Rows"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ShipList" type="VBoxContainer" parent="Column/ShipPicker/Margins/Rows/ShipScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="NoShips" type="Label" parent="Column/ShipPicker/Margins/Rows"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "No ship can fly this launch: data/ships/ has no ship with a hull."
+autowrap_mode = 3
+
+[node name="CancelButton" type="Button" parent="Column/ShipPicker/Margins/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+text = "Cancel"

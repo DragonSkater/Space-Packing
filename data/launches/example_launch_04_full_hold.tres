@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="ScheduledLaunch" format=3]
+
+[ext_resource type="Script" path="res://game/launch/scheduled_launch.gd" id="1_launch"]
+[ext_resource type="Script" path="res://core/packing/batch.gd" id="2_batch"]
+[ext_resource type="Resource" path="res://data/bodies/planet_a.tres" id="3_destination"]
+[ext_resource type="Resource" path="res://data/cargo/example_block.tres" id="4_block"]
+[ext_resource type="Resource" path="res://data/cargo/example_beam.tres" id="5_beam"]
+[ext_resource type="Resource" path="res://data/cargo/example_crate.tres" id="6_crate"]
+
+[sub_resource type="Resource" id="batch_1"]
+script = ExtResource("2_batch")
+item_type = ExtResource("4_block")
+count = 2
+required = true
+
+[sub_resource type="Resource" id="batch_2"]
+script = ExtResource("2_batch")
+item_type = ExtResource("5_beam")
+count = 8
+required = true
+
+[sub_resource type="Resource" id="batch_3"]
+script = ExtResource("2_batch")
+item_type = ExtResource("6_crate")
+count = 4
+required = true
+
+[resource]
+script = ExtResource("1_launch")
+display_name = "Example full hold"
+destination = ExtResource("3_destination")
+description = "Placeholder level: 28 spots of cargo, the size of example ship 1's hold. The player picks the ship. The stack and the move limit are starter values for the designer to replace."
+manifest = Array[ExtResource("2_batch")]([SubResource("batch_1"), SubResource("batch_2"), SubResource("batch_3")])
+move_limit = 18
