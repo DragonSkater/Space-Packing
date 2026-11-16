@@ -1,7 +1,7 @@
-## Opens the overview and checks it: the controls are listed; there is one
-## row per upcoming launch, only the first open at the start; and after a
-## launch there is a row for the launched ship with its packed hull, and the
-## next launch is open. It uses the running GameState and clears it afterwards.
+## Opens the overview and checks it: the controls open from the ! button
+## and close again; there is one row per upcoming launch, only the first
+## open at the start; and after a launch there is a row for the launched
+## ship with its packed hull, and the next launch is open. It uses the running GameState and clears it afterwards.
 extends TestCase
 
 const SCREEN_PATH: String = "res://ui/overview/overview_screen.tscn"
@@ -19,12 +19,17 @@ func test_at_the_start_nothing_is_launched_and_only_the_first_launch_is_open() -
 	screen.free()
 
 
-func test_the_controls_are_listed_from_the_start() -> void:
+func test_the_controls_are_hidden_until_the_help_button_is_pressed() -> void:
 	GameState.clear_launches()
 	var screen: OverviewScreen = _open_screen()
+	var panel: Control = screen.get_node("%HelpPanel") as Control
+	assert_true(not panel.visible, "the overview starts without the list")
+	(screen.get_node("%HelpButton") as Button).pressed.emit()
+	assert_true(panel.visible, "! opens it")
 	var controls: Label = screen.get_node("%Controls") as Label
-	assert_true(controls.visible, "the list is shown before anything is launched")
 	assert_true(controls.text.contains("Swipe up or down"), "turning is one of the controls listed")
+	(screen.get_node("%CloseHelpButton") as Button).pressed.emit()
+	assert_true(not panel.visible, "Close shuts it")
 	screen.free()
 
 

@@ -38,10 +38,35 @@ grow_vertical = 2
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Title" type="Label" parent="Column/Margins/Rows"]
+[node name="TitleRow" type="Control" parent="Column/Margins/Rows"]
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
+
+[node name="Title" type="Label" parent="Column/Margins/Rows/TitleRow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "OVERVIEW"
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HelpButton" type="Button" parent="Column/Margins/Rows/TitleRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -44.0
+grow_horizontal = 0
+grow_vertical = 2
+focus_mode = 0
+tooltip_text = "How to pack"
+text = "!"
 
 [node name="Count" type="Label" parent="Column/Margins/Rows"]
 unique_name_in_owner = true
@@ -81,24 +106,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="ControlsTitle" type="Label" parent="Column/Margins/Rows"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 11
-text = "HOW TO PACK"
-
-[node name="Controls" type="Label" parent="Column/Margins/Rows"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "• Tap the top of CARGO, or drag it to a door, to give the crane a piece.
-• Tap a lit door to move the crane's piece there.
-• Swipe left or right to slide a piece along its row. Slide it back out of a door to unload it.
-• Swipe up or down to turn a piece a quarter turn.
-• Tap a piece in the hull to work on it. Tap empty space to go back to the crane's piece.
-• Tap CARGO while the crane holds a piece to put it back.
-• Every slide and turn costs a move. Press Done, then launch."
-autowrap_mode = 3
-
 [node name="UpcomingTitle" type="Label" parent="Column/Margins/Rows"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
@@ -117,6 +124,70 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "No launches scheduled: data/launches/ is empty."
 autowrap_mode = 3
+
+[node name="HelpPanel" type="Control" parent="Column"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Backdrop" type="ColorRect" parent="Column/HelpPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.09, 0.13, 1)
+
+[node name="Margins" type="MarginContainer" parent="Column/HelpPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 32
+
+[node name="Rows" type="VBoxContainer" parent="Column/HelpPanel/Margins"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Column/HelpPanel/Margins/Rows"]
+layout_mode = 2
+text = "HOW TO PACK"
+horizontal_alignment = 1
+
+[node name="Controls" type="Label" parent="Column/HelpPanel/Margins/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "• Tap the top of CARGO, or drag it to a door, to give the crane a piece.
+• Tap a lit door to move the crane's piece there.
+• Swipe left or right to slide a piece along its row. Slide it back out of a door to unload it.
+• Swipe up or down to turn a piece a quarter turn.
+• Tap a piece in the hull to work on it. Tap empty space to go back to the crane's piece.
+• Tap CARGO while the crane holds a piece to put it back.
+• Every slide and turn costs a move. Press Done, then launch."
+autowrap_mode = 3
+
+[node name="Spacer" type="Control" parent="Column/HelpPanel/Margins/Rows"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CloseHelpButton" type="Button" parent="Column/HelpPanel/Margins/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+text = "Close"
 
 [node name="ShipPicker" type="Control" parent="Column"]
 unique_name_in_owner = true

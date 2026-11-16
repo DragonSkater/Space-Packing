@@ -2,8 +2,9 @@
 ## map with the launched ships on it, a list of launched ships, each with a
 ## picture of how it was packed, and the upcoming launches, which are
 ## placeholders until the contracts of milestone 6. A launch that leaves the
-## ship to the player opens the ship picker first. It reads GameState and
-## Catalog; choosing only reports, and whoever opened the screen starts it.
+## ship to the player opens the ship picker first; the ! button opens how to
+## pack. It reads GameState and Catalog; choosing only reports, and whoever
+## opened the screen starts it.
 class_name OverviewScreen
 extends Control
 
@@ -33,6 +34,9 @@ const COUNT_TEXT: String = "Launches so far: %d"
 @onready var _upcoming_list: VBoxContainer = %UpcomingList
 @onready var _nothing_scheduled: Label = %NothingScheduled
 @onready var _ship_picker: ShipPicker = %ShipPicker
+@onready var _help_button: Button = %HelpButton
+@onready var _help_panel: Control = %HelpPanel
+@onready var _close_help: Button = %CloseHelpButton
 
 
 # Applies the margins, and redraws whenever a launch is recorded.
@@ -45,13 +49,17 @@ func _ready() -> void:
 	GameState.launch_recorded.connect(_on_launch_recorded)
 	_ship_picker.ship_chosen.connect(_on_ship_chosen)
 	_ship_picker.cancelled.connect(_ship_picker.close)
+	_help_button.custom_minimum_size = Vector2.ONE * tuning.min_touch_target
+	_help_button.pressed.connect(_show_help.bind(true))
+	_close_help.pressed.connect(_show_help.bind(false))
 	_redraw()
 
 
 ## Brings everything on the screen up to date. Called by Boot each time the
-## overview is shown. A ship picker left open is closed.
+## overview is shown. A ship picker or help left open is closed.
 func refresh() -> void:
 	_ship_picker.close()
+	_show_help(false)
 	_redraw()
 
 
@@ -97,6 +105,11 @@ func _fill_upcoming(tuning: PresentationTuning) -> void:
 		var open: bool = GameState.is_open(scheduled)
 		row.show_launch(scheduled, open, GameState.is_fulfilled(scheduled), GameState.times_flown(scheduled), tuning)
 		row.chosen.connect(_on_upcoming_chosen)
+
+
+# How to pack, kept off the overview until the ! button asks for it.
+func _show_help(shown: bool) -> void:
+	_help_panel.visible = shown
 
 
 # A launch was tapped. When the player picks the ship, the picker opens
