@@ -11,6 +11,8 @@ extends Resource
 #   Read by:    ui/common/grid_view.gd, ui/common/gesture_reader.gd, ui/common/item_painter.gd,
 #               ui/common/label_painter.gd and every script in ui/packing/
 #   The Crane group: ui/packing/loading_bay.gd -> _process(), ui/packing/item_layer.gd -> _process()
+#   The Overview group: ui/overview/space_map_view.gd -> _draw()
+#   The Launch screen group: ui/reports/star_chart.gd -> _draw(), ui/reports/launch_button.gd -> _draw()
 #   Tests:      tests/game/test_catalog.gd
 
 @export_group("Spots")
@@ -144,6 +146,56 @@ extends Resource
 @export_range(0.02, 1.0, 0.01) var moves_flash_duration: float = 0.12
 ## How many times the moves number flashes.
 @export_range(1, 8) var moves_flash_count: int = 2
+
+@export_group("Overview")
+## The radius of a body on the map, in screen units, when it has no texture.
+@export_range(4.0, 48.0, 1.0) var map_body_radius: float = 16.0
+## The radius of home, which is drawn larger so its pads fit round it.
+@export_range(4.0, 64.0, 1.0) var map_home_radius: float = 26.0
+## The size of one numbered launch pad drawn round a body.
+@export_range(4.0, 24.0, 1.0) var map_pad_size: float = 11.0
+## The size of a launched ship's marker on the map.
+@export_range(4.0, 24.0, 1.0) var map_ship_size: float = 9.0
+## The angle between two ships' markers parked round the same body, in degrees.
+@export_range(10.0, 90.0, 1.0) var map_fleet_spacing_degrees: float = 32.0
+## The size of the names and distances on the map.
+@export_range(6, 24) var map_font_size: int = 11
+## The length of one dash of a route, and of the gap after it.
+@export_range(2.0, 16.0, 0.5) var map_dash_length: float = 5.0
+## The thickness of a route.
+@export_range(0.5, 4.0, 0.5) var map_link_width: float = 1.5
+## Behind the map.
+@export var map_backdrop_colour: Color = Color(0.07, 0.08, 0.12)
+## The dashed routes between bodies.
+@export var map_link_colour: Color = Color(0.6, 0.65, 0.75, 0.7)
+## Names and distances on the map.
+@export var map_label_colour: Color = Color(0.85, 0.88, 0.95)
+## A launched ship's marker. A ship that left required cargo behind wears
+## the attention colour instead.
+@export var map_ship_colour: Color = Color(0.4, 0.95, 0.6)
+
+@export_group("Launch screen")
+## The picture in the star chart. It is decoration and shows no information
+## (PLAN.md section 2, D37). Empty draws a placeholder fan of stars.
+@export var star_chart_texture: Texture2D
+## How wide the placeholder fan opens, in degrees.
+@export_range(30.0, 180.0, 1.0) var star_chart_spread_degrees: float = 120.0
+## How many stars the placeholder fan holds.
+@export_range(0, 80) var star_chart_star_count: int = 22
+## The radius of one star in the placeholder fan.
+@export_range(0.5, 6.0, 0.5) var star_size: float = 2.0
+## Picks where the placeholder's stars fall. Any number gives a fixed sky.
+@export_range(0, 9999) var star_chart_seed: int = 7
+## The fan's outline and the lines between its stars.
+@export var star_chart_colour: Color = Color(0.55, 0.62, 0.8, 0.8)
+## The stars.
+@export var star_colour: Color = Color(0.95, 0.95, 1.0)
+## The diameter of the round launch button.
+@export_range(44.0, 160.0, 1.0) var launch_button_size: float = 76.0
+## The launch button's face.
+@export var launch_button_colour: Color = Color(0.85, 0.3, 0.25)
+## The L on the launch button, and its rim.
+@export var launch_button_letter_colour: Color = Color(1.0, 0.95, 0.9)
 
 
 ## The values the running game uses, from the Tuning autoload.

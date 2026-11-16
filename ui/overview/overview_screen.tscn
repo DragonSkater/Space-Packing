@@ -1,0 +1,100 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/overview/overview_screen.gd" id="1_screen"]
+[ext_resource type="Script" path="res://ui/overview/space_map_view.gd" id="2_map"]
+
+[node name="OverviewScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_screen")
+
+[node name="Column" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -201.0
+offset_right = 201.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.13, 0.18, 1)
+
+[node name="Margins" type="MarginContainer" parent="Column"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Rows" type="VBoxContainer" parent="Column/Margins"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Column/Margins/Rows"]
+layout_mode = 2
+text = "OVERVIEW"
+horizontal_alignment = 1
+
+[node name="Count" type="Label" parent="Column/Margins/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+horizontal_alignment = 1
+
+[node name="MapView" type="Control" parent="Column/Margins/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.4
+mouse_filter = 2
+script = ExtResource("2_map")
+
+[node name="LaunchedTitle" type="Label" parent="Column/Margins/Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "LAUNCHED"
+
+[node name="NoLaunches" type="Label" parent="Column/Margins/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Nothing launched yet. Pack the next launch below."
+autowrap_mode = 3
+
+[node name="LaunchedScroll" type="ScrollContainer" parent="Column/Margins/Rows"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="LaunchedList" type="VBoxContainer" parent="Column/Margins/Rows/LaunchedScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="UpcomingTitle" type="Label" parent="Column/Margins/Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "UPCOMING (placeholder launches until the contracts of milestone 6)"
+autowrap_mode = 3
+
+[node name="UpcomingList" type="VBoxContainer" parent="Column/Margins/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="NothingScheduled" type="Label" parent="Column/Margins/Rows"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "No launches scheduled: data/launches/ is empty."
+autowrap_mode = 3

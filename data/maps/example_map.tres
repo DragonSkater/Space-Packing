@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="SpaceMap" format=3]
+
+[ext_resource type="Script" path="res://game/space/space_map.gd" id="1_map"]
+[ext_resource type="Script" path="res://game/space/space_link.gd" id="2_link"]
+[ext_resource type="Resource" path="res://data/bodies/home.tres" id="b_home"]
+[ext_resource type="Resource" path="res://data/bodies/station.tres" id="b_station"]
+[ext_resource type="Resource" path="res://data/bodies/planet_a.tres" id="b_planet_a"]
+[ext_resource type="Resource" path="res://data/bodies/satellite_c.tres" id="b_satellite_c"]
+[ext_resource type="Resource" path="res://data/bodies/asteroid_b.tres" id="b_asteroid_b"]
+
+[sub_resource type="Resource" id="l_home_station"]
+script = ExtResource("2_link")
+from_body = ExtResource("b_home")
+to_body = ExtResource("b_station")
+distance_ls = 2.0
+
+[sub_resource type="Resource" id="l_home_asteroid"]
+script = ExtResource("2_link")
+from_body = ExtResource("b_home")
+to_body = ExtResource("b_asteroid_b")
+distance_ls = 4.0
+
+[sub_resource type="Resource" id="l_home_satellite"]
+script = ExtResource("2_link")
+from_body = ExtResource("b_home")
+to_body = ExtResource("b_satellite_c")
+distance_ls = 3.0
+
+[sub_resource type="Resource" id="l_station_planet"]
+script = ExtResource("2_link")
+from_body = ExtResource("b_station")
+to_body = ExtResource("b_planet_a")
+distance_ls = 6.0
+
+[sub_resource type="Resource" id="l_planet_asteroid"]
+script = ExtResource("2_link")
+from_body = ExtResource("b_planet_a")
+to_body = ExtResource("b_asteroid_b")
+distance_ls = 8.0
+
+[sub_resource type="Resource" id="l_satellite_station"]
+script = ExtResource("2_link")
+from_body = ExtResource("b_satellite_c")
+to_body = ExtResource("b_station")
+distance_ls = 5.0
+
+[resource]
+script = ExtResource("1_map")
+display_name = "Example map"
+home = ExtResource("b_home")
+bodies = Array[Resource]([ExtResource("b_home"), ExtResource("b_station"), ExtResource("b_planet_a"), ExtResource("b_satellite_c"), ExtResource("b_asteroid_b")])
+links = Array[Resource]([SubResource("l_home_station"), SubResource("l_home_asteroid"), SubResource("l_home_satellite"), SubResource("l_station_planet"), SubResource("l_planet_asteroid"), SubResource("l_satellite_station")])

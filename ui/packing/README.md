@@ -8,6 +8,6 @@ The packing screen: stack, gantry, hull, stats and checks.
 - `loading_bay.gd`: reads gestures on the middle of the screen and tells the controls what was touched.
 - `stack_view.gd`, `gantry_view.gd`, `item_layer.gd`: draw the stack, the gantry and the pieces.
 - `top_strip.gd`, `stat_slot.tscn`: the scenario name, the moves left and the STATS row.
-- `round_summary.tscn`: the plain panel after Done, which also says which launch the load was kept as. The launch screen replaces it in milestone 5.
+- After Done the screen hands the committed load to whoever opened it; `ui/reports/launch_screen.tscn` shows it. The Overview button leaves the round without launching.
 
 Owner: agents (code). The designer owns the theme and every texture it shows.

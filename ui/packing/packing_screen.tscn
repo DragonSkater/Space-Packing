@@ -8,7 +8,6 @@
 [ext_resource type="Script" path="res://ui/packing/gantry_view.gd" id="6_gantry"]
 [ext_resource type="Script" path="res://ui/packing/item_layer.gd" id="7_items"]
 [ext_resource type="PackedScene" path="res://ui/packing/stat_slot.tscn" id="8_slot"]
-[ext_resource type="PackedScene" path="res://ui/packing/round_summary.tscn" id="9_summary"]
 
 [node name="PackingScreen" type="Control"]
 layout_mode = 3
@@ -192,6 +191,12 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_constants/separation = 8
 
+[node name="OverviewButton" type="Button" parent="Column/Margins/Rows/Bottom/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Overview"
+
 [node name="RestartButton" type="Button" parent="Column/Margins/Rows/Bottom/Buttons"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -203,8 +208,3 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Done"
-
-[node name="RoundSummary" parent="Column" instance=ExtResource("9_summary")]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1

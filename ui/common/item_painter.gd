@@ -9,7 +9,8 @@ extends RefCounted
 # Where to look
 #   Used by:    ui/packing/item_layer.gd -> _draw_piece()
 #               ui/packing/stack_view.gd -> _draw()
-#   Draws:      core/packing/pack_item.gd, with the colour or texture of core/packing/pack_item_type.gd
+#               ui/common/fixed_cargo_view.gd -> _draw()
+#   Draws:      core/packing/pack_item.gd or core/packing/committed_item.gd, with the colour or texture of core/packing/pack_item_type.gd
 #   Letters:    ui/common/label_painter.gd -> draw_centred()
 #   Numbers:    ui/common/presentation_tuning.gd, the Spots and Colours groups
 
@@ -19,19 +20,26 @@ const SIDES: Array[Vector2i] = [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vect
 ## Draws the item with the top-left corner of its bounding box at top_left
 ## and each of its cells spot units across.
 static func draw_item(canvas: Control, item: PackItem, top_left: Vector2, spot: float, tuning: PresentationTuning, opacity: float = 1.0) -> void:
-	if item.type.texture != null:
-		_draw_texture(canvas, item, top_left, spot, opacity)
+	draw_piece(canvas, item.type, item.shape, item.quarter_turns, top_left, spot, tuning, opacity)
+
+
+## Draws a piece of a type, in a shape already turned quarter_turns times
+## clockwise. For pieces that are not live items, such as the copies kept
+## in a CommitRecord.
+static func draw_piece(canvas: Control, type: PackItemType, shape: CellShape, quarter_turns: int, top_left: Vector2, spot: float, tuning: PresentationTuning, opacity: float = 1.0) -> void:
+	if type.texture != null:
+		_draw_texture(canvas, type, shape, quarter_turns, top_left, spot, opacity)
 		return
-	var fill: Color = item.type.colour
+	var fill: Color = type.colour
 	fill.a *= opacity
-	for cell: Vector2i in item.shape.cells:
-		canvas.draw_rect(_cell_rect(item.shape, cell, top_left, spot, tuning.piece_inset), fill)
+	for cell: Vector2i in shape.cells:
+		canvas.draw_rect(_cell_rect(shape, cell, top_left, spot, tuning.piece_inset), fill)
 	var border: Color = fill.darkened(tuning.piece_border_darkening)
-	draw_outline(canvas, item.shape, top_left, spot, tuning.piece_inset, border, tuning.outline_width)
-	var label_rect: Rect2 = Rect2(top_left + Vector2(item.shape.cells[0]) * spot, Vector2(spot, spot))
+	draw_outline(canvas, shape, top_left, spot, tuning.piece_inset, border, tuning.outline_width)
+	var label_rect: Rect2 = Rect2(top_left + Vector2(shape.cells[0]) * spot, Vector2(spot, spot))
 	var label_colour: Color = tuning.piece_label_colour
 	label_colour.a *= opacity
-	LabelPainter.draw_centred(canvas, label_rect, item.type.display_name, LabelPainter.size_for_spot(spot, tuning), label_colour)
+	LabelPainter.draw_centred(canvas, label_rect, type.display_name, LabelPainter.size_for_spot(spot, tuning), label_colour)
 
 
 ## Draws a line along every outer edge of the shape, inset from the edge of
@@ -75,9 +83,9 @@ static func _rect_side(side: Vector2i) -> Side:
 
 # PLAN.md section 5, "From text to art": the picture is drawn once, unturned,
 # over the bounding box of the shape in the item type, and turns with the item.
-static func _draw_texture(canvas: Control, item: PackItem, top_left: Vector2, spot: float, opacity: float) -> void:
-	var unturned_size: Vector2 = Vector2(item.type.shape().bounds().size) * spot
-	var centre: Vector2 = top_left + Vector2(item.shape.bounds().size) * spot / 2.0
-	canvas.draw_set_transform(centre, item.quarter_turns * PI / 2.0)
-	canvas.draw_texture_rect(item.type.texture, Rect2(-unturned_size / 2.0, unturned_size), false, Color(1.0, 1.0, 1.0, opacity))
+static func _draw_texture(canvas: Control, type: PackItemType, shape: CellShape, quarter_turns: int, top_left: Vector2, spot: float, opacity: float) -> void:
+	var unturned_size: Vector2 = Vector2(type.shape().bounds().size) * spot
+	var centre: Vector2 = top_left + Vector2(shape.bounds().size) * spot / 2.0
+	canvas.draw_set_transform(centre, quarter_turns * PI / 2.0)
+	canvas.draw_texture_rect(type.texture, Rect2(-unturned_size / 2.0, unturned_size), false, Color(1.0, 1.0, 1.0, opacity))
 	canvas.draw_set_transform(Vector2.ZERO)

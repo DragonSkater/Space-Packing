@@ -1,0 +1,135 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/reports/launch_screen.gd" id="1_screen"]
+[ext_resource type="Script" path="res://ui/common/fixed_cargo_view.gd" id="2_cargo"]
+[ext_resource type="Script" path="res://ui/reports/star_chart.gd" id="3_chart"]
+[ext_resource type="Script" path="res://ui/reports/launch_button.gd" id="4_button"]
+
+[node name="LaunchScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_screen")
+
+[node name="Column" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -201.0
+offset_right = 201.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.13, 0.18, 1)
+
+[node name="Margins" type="MarginContainer" parent="Column"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Rows" type="VBoxContainer" parent="Column/Margins"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Heading" type="Label" parent="Column/Margins/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="FixedTitle" type="Label" parent="Column/Margins/Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "FIXED CARGO"
+horizontal_alignment = 1
+
+[node name="FixedCargo" type="Control" parent="Column/Margins/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+script = ExtResource("2_cargo")
+
+[node name="Report" type="PanelContainer" parent="Column/Margins/Rows"]
+layout_mode = 2
+
+[node name="ReportRows" type="VBoxContainer" parent="Column/Margins/Rows/Report"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="ChecksTitle" type="Label" parent="Column/Margins/Rows/Report/ReportRows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "CHECKS"
+
+[node name="ChecksLine" type="Label" parent="Column/Margins/Rows/Report/ReportRows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="TimeTitle" type="Label" parent="Column/Margins/Rows/Report/ReportRows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "TIME"
+
+[node name="MovesLine" type="Label" parent="Column/Margins/Rows/Report/ReportRows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="TravelLine" type="Label" parent="Column/Margins/Rows/Report/ReportRows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="ApprovalTitle" type="Label" parent="Column/Margins/Rows/Report/ReportRows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "APPROVAL"
+
+[node name="AboardLine" type="Label" parent="Column/Margins/Rows/Report/ReportRows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="BillLine" type="Label" parent="Column/Margins/Rows/Report/ReportRows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="StarChart" type="Control" parent="Column/Margins/Rows"]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("3_chart")
+
+[node name="LaunchButton" type="Button" parent="Column/Margins/Rows/StarChart"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+focus_mode = 0
+flat = true
+script = ExtResource("4_button")
+
+[node name="BackButton" type="Button" parent="Column/Margins/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Back to packing"

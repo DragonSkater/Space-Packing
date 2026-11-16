@@ -1,7 +1,9 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://ui/boot/boot.gd" id="1_boot"]
-[ext_resource type="PackedScene" path="res://ui/packing/packing_screen.tscn" id="2_packing"]
+[ext_resource type="PackedScene" path="res://ui/overview/overview_screen.tscn" id="2_overview"]
+[ext_resource type="PackedScene" path="res://ui/packing/packing_screen.tscn" id="3_packing"]
+[ext_resource type="PackedScene" path="res://ui/reports/launch_screen.tscn" id="4_launch"]
 
 [node name="Boot" type="Control"]
 layout_mode = 3
@@ -21,6 +23,16 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.06, 0.09, 1)
 
-[node name="PackingScreen" parent="." instance=ExtResource("2_packing")]
+[node name="OverviewScreen" parent="." instance=ExtResource("2_overview")]
 unique_name_in_owner = true
+layout_mode = 1
+
+[node name="PackingScreen" parent="." instance=ExtResource("3_packing")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="LaunchScreen" parent="." instance=ExtResource("4_launch")]
+unique_name_in_owner = true
+visible = false
 layout_mode = 1

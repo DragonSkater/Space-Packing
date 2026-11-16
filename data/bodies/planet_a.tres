@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Body" format=3]
+
+[ext_resource type="Script" path="res://game/space/body.gd" id="1_body"]
+
+[resource]
+script = ExtResource("1_body")
+id = &"planet_a"
+display_name = "Planet A"
+kind = "planet"
+pads = 0
+map_position = Vector2(0.8, 0.2)
+colour = Color(0.85, 0.62, 0.35, 1)
+description = "Starter values: the pad count, map position and colour are placeholders for the designer to set."

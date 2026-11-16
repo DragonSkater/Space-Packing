@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ScheduledLaunch" format=3]
+
+[ext_resource type="Script" path="res://game/launch/scheduled_launch.gd" id="1_launch"]
+[ext_resource type="Resource" path="res://data/bodies/satellite_c.tres" id="2_destination"]
+[ext_resource type="Resource" path="res://data/scenarios/example_03_either_end.tres" id="3_scenario"]
+[ext_resource type="Resource" path="res://data/launches/example_launch_02.tres" id="4_requires"]
+
+[resource]
+script = ExtResource("1_launch")
+display_name = "Example relay run"
+destination = ExtResource("2_destination")
+scenario = ExtResource("3_scenario")
+requires = ExtResource("4_requires")
+description = "Placeholder for the Satellite C contract of milestone 6. It flies example scenario 3."

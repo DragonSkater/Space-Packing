@@ -6,8 +6,9 @@ extends Node
 
 # Where to look
 #   Reads:      every .tres in the folders of data/, except data/tuning/
-#   Kinds:      core/packing/packing_scenario.gd, core/packing/pack_item_type.gd, core/grid/layout_legend.gd
-#   Used by:    ui/boot/boot.gd -> _open_scenario()
+#   Kinds:      core/packing/packing_scenario.gd, core/packing/pack_item_type.gd, core/grid/layout_legend.gd,
+#               game/space/space_map.gd, game/launch/scheduled_launch.gd
+#   Used by:    ui/overview/overview_screen.gd -> _redraw()
 #   Registered: project.godot, under [autoload]
 #   Tests:      tests/game/test_catalog.gd, tests/data/test_example_data.gd
 
@@ -15,6 +16,8 @@ const DATA_ROOT: String = "res://data"
 const SCENARIOS_FOLDER: String = "scenarios"
 const ITEM_TYPES_FOLDER: String = "cargo"
 const LEGENDS_FOLDER: String = "legends"
+const MAPS_FOLDER: String = "maps"
+const LAUNCHES_FOLDER: String = "launches"
 # The Tuning autoload loads this folder itself.
 const SKIPPED_FOLDERS: Array[String] = ["tuning"]
 const FOLDER_SUFFIX: String = "/"
@@ -71,6 +74,25 @@ func legends() -> Array[LayoutLegend]:
 	var found: Array[LayoutLegend] = []
 	for resource: Resource in in_folder(LEGENDS_FOLDER):
 		if resource is LayoutLegend:
+			found.append(resource)
+	return found
+
+
+## The maps in data/maps/. The overview draws the first.
+func space_maps() -> Array[SpaceMap]:
+	var found: Array[SpaceMap] = []
+	for resource: Resource in in_folder(MAPS_FOLDER):
+		if resource is SpaceMap:
+			found.append(resource)
+	return found
+
+
+## The upcoming launches in data/launches/, in file-name order, which is the
+## order the overview lists them in.
+func scheduled_launches() -> Array[ScheduledLaunch]:
+	var found: Array[ScheduledLaunch] = []
+	for resource: Resource in in_folder(LAUNCHES_FOLDER):
+		if resource is ScheduledLaunch:
 			found.append(resource)
 	return found
 

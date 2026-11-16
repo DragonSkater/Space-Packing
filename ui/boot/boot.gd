@@ -1,43 +1,75 @@
-## The first scene the game opens. For now it shows the packing screen and
-## hands it one example scenario at a time from the Catalog, moving to the
-## next when the screen asks, and passes each committed load to GameState to
-## be kept as a launch. It holds no rules of its own. The overview
-## screen takes over choosing what is played in milestone 6.
+## The first scene the game opens, and the one that moves the player round
+## the loop: the overview, then packing the launch they chose, then the
+## launch screen, then back to the overview with the ship on the map. It
+## shows one screen at a time. It holds no rules of its own: GameState
+## records the launch, and each screen only reports what was pressed.
 extends Control
 
 # Where to look
 #   Scene:      ui/boot/boot.tscn, the project's main scene
-#   Opens:      ui/packing/packing_screen.gd -> open_scenario()
-#   Content:    game/app/catalog.gd -> scenarios()
+#   Screens:    ui/overview/overview_screen.gd -> refresh()
+#               ui/packing/packing_screen.gd -> open_scenario()
+#               ui/reports/launch_screen.gd -> show_load()
 #   Keeps:      game/app/game_state.gd -> record_launch()
+#   Tests:      tests/ui/test_boot.gd
 
-var _scenario_index: int = 0
+# The upcoming launch being packed, and its load once Done is pressed.
+var _scheduled: ScheduledLaunch
+var _round_name: String = ""
+var _committed: CommitRecord
 
-@onready var _packing_screen: PackingScreen = %PackingScreen
+@onready var _overview: OverviewScreen = %OverviewScreen
+@onready var _packing: PackingScreen = %PackingScreen
+@onready var _launch: LaunchScreen = %LaunchScreen
 
 
-# Opens the first scenario and listens for the screen asking for another.
+# Joins the screens' signals and opens on the overview.
 func _ready() -> void:
-	_packing_screen.next_scenario_requested.connect(_open_next_scenario)
-	_packing_screen.round_committed.connect(_on_round_committed)
-	_open_scenario(_scenario_index)
+	_overview.launch_chosen.connect(_open_packing)
+	_packing.overview_requested.connect(_show_overview)
+	_packing.round_committed.connect(_open_launch)
+	_launch.back_pressed.connect(_show_only.bind(_packing))
+	_launch.launch_pressed.connect(_on_launch_pressed)
+	_show_overview()
 
 
-# Called when Next scenario is pressed on the summary panel.
-func _open_next_scenario() -> void:
-	_open_scenario(_scenario_index + 1)
+# The overview, brought up to date.
+func _show_overview() -> void:
+	_overview.refresh()
+	_show_only(_overview)
 
 
-# Until the launch screen exists (milestone 5), Done is the launch.
-func _on_round_committed(round_name: String, record: CommitRecord) -> void:
-	GameState.record_launch(round_name, record)
-
-
-# Past the last scenario it starts again from the first.
-func _open_scenario(index: int) -> void:
-	var scenarios: Array[PackingScenario] = Catalog.scenarios()
-	if scenarios.is_empty():
-		push_error("Boot: data/scenarios/ holds no scenario to open.")
+# A fresh round of the chosen launch.
+func _open_packing(scheduled: ScheduledLaunch) -> void:
+	if scheduled.scenario == null:
+		push_error("Boot: %s has no scenario to pack." % scheduled.display_name)
 		return
-	_scenario_index = index % scenarios.size()
-	_packing_screen.open_scenario(scenarios[_scenario_index])
+	_scheduled = scheduled
+	# Shown first: a hidden container is not laid out, and the round sizes
+	# its grid from the space it is given.
+	_show_only(_packing)
+	_packing.open_scenario(scheduled.scenario)
+
+
+# Done was pressed: show the load before it launches. The packing round is
+# kept as it is, so Back returns to it with nothing lost.
+func _open_launch(round_name: String, record: CommitRecord) -> void:
+	_round_name = round_name
+	_committed = record
+	var destination: Body = null
+	if _scheduled != null:
+		destination = _scheduled.destination
+	_show_only(_launch)
+	_launch.show_load(round_name, record, destination)
+
+
+# The launch button: the load becomes a launch, and the overview shows it.
+func _on_launch_pressed() -> void:
+	GameState.record_launch(_round_name, _committed, _scheduled)
+	_show_overview()
+
+
+# Shows one screen and hides the others.
+func _show_only(screen: Control) -> void:
+	for each: Control in [_overview, _packing, _launch]:
+		each.visible = each == screen

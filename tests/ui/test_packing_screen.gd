@@ -1,45 +1,42 @@
 ## Opens the packing screen with each example scenario and presses its
 ## buttons, to prove the scene's parts are joined up: Done is never refused
-## and shows the summary, Restart starts again. It cannot see the screen or
-## make a gesture; the gestures are tested in test_gesture_reader.gd and
-## what they do in test_crane_controls.gd.
+## and hands the load on, Overview asks to leave, Restart starts again. It
+## cannot see the screen or make a gesture; the gestures are tested in
+## test_gesture_reader.gd and what they do in test_crane_controls.gd.
 extends TestCase
 
 const SCREEN_PATH: String = "res://ui/packing/packing_screen.tscn"
 
 
-func test_done_shows_the_summary_and_restart_clears_it_in_every_scenario() -> void:
+func test_done_hands_on_the_load_in_every_scenario() -> void:
 	var screen: PackingScreen = _open_screen()
-	var summary: RoundSummary = screen.get_node("%RoundSummary") as RoundSummary
+	var handed_on: Array[CommitRecord] = []
+	screen.round_committed.connect(func(_name: String, record: CommitRecord) -> void: handed_on.append(record))
 	for scenario: PackingScenario in Catalog.scenarios():
 		screen.open_scenario(scenario)
-		assert_true(not summary.visible, "%s opens on the round" % scenario.display_name)
 		_press(screen, "%DoneButton")
-		assert_true(summary.visible, "Done is never refused")
-		_press(summary, "%SummaryRestart")
-		assert_true(not summary.visible, "Restart goes back to the round")
+	assert_eq(handed_on.size(), Catalog.scenarios().size(), "Done is never refused")
 	screen.free()
 
 
-func test_the_summary_says_what_was_left_behind() -> void:
+func test_the_load_handed_on_says_what_was_left_behind() -> void:
 	var screen: PackingScreen = _open_screen()
+	var handed_on: Array[CommitRecord] = []
+	screen.round_committed.connect(func(_name: String, record: CommitRecord) -> void: handed_on.append(record))
 	screen.open_scenario(Catalog.scenarios()[0])
 	_press(screen, "%DoneButton")
-	var summary: RoundSummary = screen.get_node("%RoundSummary") as RoundSummary
-	assert_eq((summary.get_node("%MovesUsed") as Label).text, "Moves used: 0 of 12")
-	var left_behind: Label = summary.get_node("%LeftBehind") as Label
-	assert_true(left_behind.visible)
-	assert_eq(left_behind.text, "Required pieces left behind: 6")
+	assert_eq(handed_on[0].moves_used, 0)
+	assert_eq(handed_on[0].moves_allowed, 12)
+	assert_eq(handed_on[0].required_left, 6)
 	screen.free()
 
 
-func test_the_screen_asks_for_the_next_scenario_from_the_summary() -> void:
+func test_the_overview_button_asks_to_leave() -> void:
 	var screen: PackingScreen = _open_screen()
 	var asked: Array[bool] = []
-	screen.next_scenario_requested.connect(asked.append.bind(true))
+	screen.overview_requested.connect(asked.append.bind(true))
 	screen.open_scenario(Catalog.scenarios()[0])
-	_press(screen, "%DoneButton")
-	_press(screen.get_node("%RoundSummary"), "%NextScenario")
+	_press(screen, "%OverviewButton")
 	assert_eq(asked.size(), 1)
 	screen.free()
 

@@ -1,7 +1,9 @@
 ## Tests for the launches GameState keeps: each committed load is kept in
-## order, with its number and round name, and the list handed out cannot
-## change what is kept. A fresh GameState is made for each test, so the
-## running game's own list is left alone.
+## order, with its number, round name and the scheduled launch it flew; the
+## list handed out cannot change what is kept; and a scheduled launch opens
+## only when the one before it was flown with nothing required left behind.
+## A fresh GameState is made for each test, so the running game's own list
+## is left alone.
 extends TestCase
 
 const GAME_STATE_PATH: String = "res://game/app/game_state.gd"
@@ -50,6 +52,43 @@ func test_clearing_forgets_every_launch_and_numbering_starts_again() -> void:
 	state.free()
 
 
+func test_a_scheduled_launch_with_nothing_required_first_is_open() -> void:
+	var state: Node = _fresh_game_state()
+	var first: ScheduledLaunch = ScheduledLaunch.new()
+	assert_true(state.is_open(first))
+	assert_eq(state.times_flown(first), 0)
+	state.free()
+
+
+func test_the_next_launch_opens_once_the_one_before_is_fulfilled() -> void:
+	var state: Node = _fresh_game_state()
+	var first: ScheduledLaunch = ScheduledLaunch.new()
+	var second: ScheduledLaunch = ScheduledLaunch.new()
+	second.requires = first
+	assert_true(not state.is_open(second), "waiting for the first")
+	var record: LaunchRecord = state.record_launch("First", _committed_record(), first)
+	assert_true(record.scheduled == first, "the record knows what it flew")
+	assert_true(state.is_fulfilled(first))
+	assert_true(state.is_open(second))
+	state.free()
+
+
+func test_a_launch_that_left_required_cargo_behind_flies_but_opens_nothing() -> void:
+	var state: Node = _fresh_game_state()
+	var first: ScheduledLaunch = ScheduledLaunch.new()
+	var second: ScheduledLaunch = ScheduledLaunch.new()
+	second.requires = first
+	var record: LaunchRecord = state.record_launch("First", _record_left_on_stack(), first)
+	assert_true(record.missed_requirements())
+	assert_eq(state.times_flown(first), 1, "it still flew (D42)")
+	assert_true(not state.is_fulfilled(first))
+	assert_true(not state.is_open(second), "the level does not advance")
+	state.record_launch("First again", _committed_record(), first)
+	assert_eq(state.times_flown(first), 2, "a launch can be flown again (D36)")
+	assert_true(state.is_open(second))
+	state.free()
+
+
 func _fresh_game_state() -> Node:
 	var script: GDScript = load(GAME_STATE_PATH) as GDScript
 	return script.new() as Node
@@ -61,5 +100,13 @@ func _committed_record() -> CommitRecord:
 	var session: PackingSession = CoreFixtures.session(ROWS, manifest)
 	session.pick_from_stack(0)
 	session.push_in(session.entry_lanes()[0], 0)
+	session.commit()
+	return session.commit_record()
+
+
+# A round committed with its one required item still on the stack.
+func _record_left_on_stack() -> CommitRecord:
+	var manifest: Array[Batch] = [CoreFixtures.batch(CoreFixtures.item_type("X"), 1)]
+	var session: PackingSession = CoreFixtures.session(ROWS, manifest)
 	session.commit()
 	return session.commit_record()
