@@ -11,7 +11,7 @@ extends Control
 #   Scene:      ui/packing/packing_screen.tscn, the node named ItemLayer
 #   Shown by:   ui/packing/loading_bay.gd -> show_round()
 #   Reads:      core/packing/packing_session.gd -> state(), held(), cost_of()
-#               ui/packing/crane_controls.gd -> active_item(), selected_item(), grip(), held_lane(),
+#               ui/packing/crane_controls.gd -> active_item(), selected_item(), grip(), held_origin(),
 #               slide(), pending_action(), is_carrying(), carry_point(), carry_lane(), stack_point()
 #   Paints via: ui/common/item_painter.gd -> draw_item(), draw_outline()
 #   Words:      ui/packing/move_words.gd -> let_go()
@@ -91,8 +91,8 @@ func _targets() -> Dictionary[int, Vector2]:
 		targets[held.id] = Vector2(_controls.carry_lane().hold_origin)
 	elif held != null and _controls.is_carrying():
 		targets[held.id] = _controls.carry_point() - Vector2(held.shape.bounds().size) / 2.0
-	elif held != null and _controls.held_lane() != null:
-		targets[held.id] = Vector2(_controls.held_lane().hold_origin)
+	elif held != null:
+		targets[held.id] = _controls.held_origin()
 	var slide: SlidePreview = _controls.slide()
 	if slide != null and targets.has(slide.item.id):
 		targets[slide.item.id] = Vector2(slide.finger_x, float(slide.start.y))

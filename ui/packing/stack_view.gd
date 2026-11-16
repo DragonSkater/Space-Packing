@@ -1,9 +1,9 @@
 ## Draws the cargo stack as a pile, top piece first. The pieces that can be
 ## taken are raised clear of the rest: the top few, and in a round that
 ## allows it the bottom one, drawn apart under the pile. While the
-## crane is empty they wear the NEXT box. A held piece that
-## no door will take is shown above the pile, since it has nowhere else to
-## wait. It answers which piece a tap is for; taking it is CraneControls' job.
+## crane is empty they wear the NEXT box. A piece the crane holds is drawn
+## by ItemLayer, outside a door, never here. It answers which piece a tap is
+## for; taking it is CraneControls' job.
 class_name StackView
 extends Control
 
@@ -11,7 +11,7 @@ extends Control
 #   Scene:      ui/packing/packing_screen.tscn, the node named StackView
 #   Used by:    ui/packing/loading_bay.gd -> show_round(), _on_tapped(), _stack_point()
 #   Reads:      core/packing/packing_session.gd -> stack(), held(), stack_reachable()
-#               ui/packing/crane_controls.gd -> held_lane(), is_carrying()
+#   Redrawn by: ui/packing/crane_controls.gd, when its view changes
 #   Paints via: ui/common/item_painter.gd -> draw_item()
 #   Numbers:    ui/common/presentation_tuning.gd, the Stack and Crane groups
 
@@ -68,18 +68,12 @@ func slot_point(index_from_top: int) -> Vector2:
 	return top_point()
 
 
-# Paints a held piece that has no door, then the pile, then the count of
-# pieces that did not fit. While the crane is empty, every piece that can be
-# taken wears the NEXT box.
+# Paints the pile, then the count of pieces that did not fit. While the
+# crane is empty, every piece that can be taken wears the NEXT box.
 func _draw() -> void:
 	if _session == null:
 		return
 	var spot: float = _tuning.stack_spot_size
-	var waiting: PackItem = _waiting_held()
-	if waiting != null:
-		var corner: Vector2 = _held_slot(waiting).position
-		ItemPainter.draw_item(self, waiting, corner, spot, _tuning)
-		ItemPainter.draw_outline(self, waiting.shape, corner, spot, 0.0, _tuning.selection_colour, _tuning.outline_width)
 	var stack: Array[PackItem] = _session.stack()
 	var slots: Dictionary[int, Rect2] = _slots()
 	for index: int in slots:
@@ -107,9 +101,6 @@ func _slots() -> Dictionary[int, Rect2]:
 		pile_size -= 1
 		room -= _slot(stack[pile_size], 0.0).size.y + _tuning.stack_gap + _tuning.stack_raise
 	var top: float = _tuning.stack_gap
-	var waiting: PackItem = _waiting_held()
-	if waiting != null:
-		top = _held_slot(waiting).end.y + _tuning.stack_gap + _tuning.stack_raise
 	for index: int in pile_size:
 		var slot: Rect2 = _slot(stack[index], top)
 		if slot.end.y > room:
@@ -138,11 +129,6 @@ func _slot(item: PackItem, top: float) -> Rect2:
 	return Rect2(Vector2((size.x - piece_size.x) / 2.0, top), piece_size)
 
 
-# Where a held piece with no door waits: at the top of the column.
-func _held_slot(item: PackItem) -> Rect2:
-	return _slot(item, _tuning.stack_gap)
-
-
 # The box round the piece the crane will take next, with its caption.
 func _draw_next_box(slot: Rect2) -> void:
 	var box: Rect2 = slot.grow(_tuning.active_box_margin)
@@ -151,14 +137,6 @@ func _draw_next_box(slot: Rect2) -> void:
 	var height: float = font.get_height(_tuning.cost_note_font_size)
 	var line: Rect2 = Rect2(0.0, box.end.y, size.x, height)
 	LabelPainter.draw_centred(self, line, NEXT_TEXT, _tuning.cost_note_font_size, _tuning.active_colour)
-
-
-# The held piece, when no door offers it a lane and the finger is not
-# carrying it; otherwise null.
-func _waiting_held() -> PackItem:
-	if _session.held() != null and _controls.held_lane() == null and not _controls.is_carrying():
-		return _session.held()
-	return null
 
 
 # Room kept at the foot of the column for the count of pieces not drawn.

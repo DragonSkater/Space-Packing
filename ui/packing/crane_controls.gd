@@ -75,6 +75,18 @@ func held_lane() -> EntryLane:
 	return _lane
 
 
+## Where the held piece waits, as the origin of its top-left corner in
+## cells: outside its door, or, when no door will take it as it is turned,
+## outside the nearest door anyway, so it can still be seen and turned.
+func held_origin() -> Vector2:
+	var held: PackItem = _session.held()
+	if held == null:
+		return Vector2.ZERO
+	if _lane != null:
+		return Vector2(_lane.hold_origin)
+	return Vector2(DoorChoice.waiting_origin(_session.state().layout, held, _stack_point))
+
+
 ## The slide in progress, or null. ItemLayer draws the piece where it says.
 func slide() -> SlidePreview:
 	return _slide
@@ -158,6 +170,20 @@ func grab_cell(cell: Vector2i) -> bool:
 	_selected_id = item.id
 	_grip = cell
 	view_changed.emit()
+	return true
+
+
+## Makes the held piece the active one when the point, in cells, is on it
+## where it waits. A gesture that starts on the held piece acts on it, even
+## when no door is lit for it to be grabbed by.
+func grab_held(point_cells: Vector2) -> bool:
+	var held: PackItem = _session.held()
+	if held == null or _carrying:
+		return false
+	var waiting: Rect2 = Rect2(held_origin(), Vector2(held.shape.bounds().size))
+	if not waiting.has_point(point_cells):
+		return false
+	tap_empty()
 	return true
 
 
@@ -267,9 +293,7 @@ func turn(clockwise: bool) -> void:
 	if item == null or _carrying:
 		return
 	if item == _session.held():
-		var waited_at: Vector2 = _stack_point
-		if _lane != null:
-			waited_at = DoorChoice.hold_centre(_lane, item)
+		var waited_at: Vector2 = held_origin() + Vector2(item.shape.bounds().size) / 2.0
 		if _session.turn_held(clockwise):
 			_lane = DoorChoice.nearest(_session.entry_lanes(), item, waited_at)
 	else:

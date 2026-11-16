@@ -12,7 +12,7 @@ extends Control
 #   Shown by:   ui/packing/packing_screen.gd -> _start_round()
 #   Gestures:   ui/common/gesture_reader.gd
 #   Passes on:  ui/packing/crane_controls.gd -> tap_stack(), tap_door(), tap_cell(), tap_empty(),
-#               grab_cell(), begin_carry(), carry_to(), end_carry(), begin_slide(), slide_by(),
+#               grab_cell(), grab_held(), begin_carry(), carry_to(), end_carry(), begin_slide(), slide_by(),
 #               end_slide(), turn(), wants_fetch(), fetch()
 #   Numbers:    ui/common/presentation_tuning.gd, the Crane group
 #   Its parts:  ui/packing/stack_view.gd -> pick_index_at(), slot_point(), ui/common/grid_view.gd, ui/packing/gantry_view.gd,
@@ -107,7 +107,8 @@ func _process(delta: float) -> void:
 
 
 # A drag locked to an axis. One that starts on the stack carries a piece
-# out; one that starts on a piece or a door makes that piece the active one.
+# out; one that starts on a piece, a door, or the held piece where it waits
+# makes that piece the active one.
 # After that, only a left-right drag slides.
 func _on_drag_started(at: Vector2, axis: GestureReader.Axis) -> void:
 	_carrying = false
@@ -123,6 +124,8 @@ func _on_drag_started(at: Vector2, axis: GestureReader.Axis) -> void:
 		var lane: EntryLane = _gantry.lane_at(grid_point)
 		if lane != null:
 			_controls.tap_door(lane)
+		else:
+			_controls.grab_held(grid_point)
 	_slide_pending = axis == GestureReader.Axis.HORIZONTAL
 
 

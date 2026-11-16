@@ -210,6 +210,39 @@ func test_a_held_piece_turns_for_a_move_and_one_that_may_not_turn_shakes() -> vo
 	assert_eq(session.moves_left(), CoreFixtures.DEFAULT_MOVE_LIMIT - 2, "the refused turn was free")
 
 
+func test_a_piece_no_door_will_take_waits_outside_the_nearest_door_and_can_be_turned() -> void:
+	# Upright, the rod needs four doors together and the hull has three.
+	var session: PackingSession = _session(["X
+X
+X
+X"])
+	var controls: CraneControls = _controls(session)
+	controls.tap_stack(0, STACK_POINT)
+	assert_true(session.held() != null, "the crane still takes it")
+	assert_true(controls.held_lane() == null, "no door will take it upright")
+	assert_eq(controls.held_origin(), Vector2(-1.0, 1.0), "it waits outside the doors, within the hull's rows")
+	assert_true(controls.active_item() == session.held(), "the next swipe acts on it")
+	controls.turn(true)
+	assert_true(session.held().shape.matches(CellShape.from_text("XXXX")))
+	assert_true(controls.held_lane() != null, "turned flat, a door takes it")
+	assert_eq(session.moves_left(), CoreFixtures.DEFAULT_MOVE_LIMIT - 1)
+
+
+func test_a_gesture_on_a_held_piece_with_no_door_makes_it_the_active_piece() -> void:
+	var session: PackingSession = _session(["X", "X
+X
+X
+X"])
+	var controls: CraneControls = _controls(session)
+	_load(controls, session, 1, 1)
+	controls.tap_stack(0, STACK_POINT)
+	controls.tap_cell(Vector2i(1, 1))
+	assert_true(controls.active_item() != session.held(), "the loaded piece is selected")
+	assert_true(not controls.grab_held(Vector2(2.5, 2.5)), "a point inside the hull is not the held piece")
+	assert_true(controls.grab_held(Vector2(-0.5, 2.5)), "a point on the held piece grabs it")
+	assert_true(controls.active_item() == session.held())
+
+
 func test_the_crane_waits_with_the_next_piece_while_a_loaded_one_is_worked() -> void:
 	var session: PackingSession = _session(["X", "X"])
 	var controls: CraneControls = _controls(session)
