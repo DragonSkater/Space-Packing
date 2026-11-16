@@ -1,7 +1,7 @@
-## Opens the overview and checks its two lists against GameState: one row
-## per upcoming launch, only the first open at the start, and after a
-## launch a row for the launched ship with its packed hull, and the next
-## launch open. It uses the running GameState and clears it afterwards.
+## Opens the overview and checks it: the controls are listed; there is one
+## row per upcoming launch, only the first open at the start; and after a
+## launch there is a row for the launched ship with its packed hull, and the
+## next launch is open. It uses the running GameState and clears it afterwards.
 extends TestCase
 
 const SCREEN_PATH: String = "res://ui/overview/overview_screen.tscn"
@@ -16,6 +16,15 @@ func test_at_the_start_nothing_is_launched_and_only_the_first_launch_is_open() -
 	assert_true(rows[1].disabled, "the second waits for the first")
 	assert_eq(_launched_rows(screen).size(), 0)
 	assert_true((screen.get_node("%NoLaunches") as Label).visible)
+	screen.free()
+
+
+func test_the_controls_are_listed_from_the_start() -> void:
+	GameState.clear_launches()
+	var screen: OverviewScreen = _open_screen()
+	var controls: Label = screen.get_node("%Controls") as Label
+	assert_true(controls.visible, "the list is shown before anything is launched")
+	assert_true(controls.text.contains("Swipe up or down"), "turning is one of the controls listed")
 	screen.free()
 
 
