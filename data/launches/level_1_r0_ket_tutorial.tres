@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="ScheduledLaunch" format=3]
+
+[ext_resource type="Script" path="res://game/launch/scheduled_launch.gd" id="1_launch"]
+[ext_resource type="Script" path="res://core/packing/batch.gd" id="2_batch"]
+[ext_resource type="Resource" path="res://data/bodies/planet_a.tres" id="3_destination"]
+[ext_resource type="Resource" path="res://data/cargo/example_crate.tres" id="4_crate"]
+[ext_resource type="Resource" path="res://data/cargo/example_beam.tres" id="5_beam"]
+[ext_resource type="Resource" path="res://data/cargo/huge_box.tres" id="6_huge_box"]
+
+[sub_resource type="Resource" id="batch_1"]
+script = ExtResource("2_batch")
+item_type = ExtResource("4_crate")
+count = 4
+required = true
+
+[sub_resource type="Resource" id="batch_2"]
+script = ExtResource("2_batch")
+item_type = ExtResource("5_beam")
+count = 2
+required = true
+
+[sub_resource type="Resource" id="batch_3"]
+script = ExtResource("2_batch")
+item_type = ExtResource("6_huge_box")
+count = 1
+required = true
+
+[sub_resource type="Resource" id="batch_4"]
+script = ExtResource("2_batch")
+item_type = ExtResource("4_crate")
+count = 2
+required = true
+
+[resource]
+script = ExtResource("1_launch")
+display_name = "R0-KET tutorial"
+destination = ExtResource("3_destination")
+description = "The designer's first level, made for R0-KET: 4 crates, 2 beams, the Huge Box, then 2 more crates (19 spots in a 21-spot hold), with 16 moves. The destination is the agent's starter choice."
+manifest = Array[ExtResource("2_batch")]([SubResource("batch_1"), SubResource("batch_2"), SubResource("batch_3"), SubResource("batch_4")])
+move_limit = 16

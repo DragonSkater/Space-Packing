@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ShipType" format=3]
+
+[ext_resource type="Script" path="res://game/ships/ship_type.gd" id="1_ship"]
+[ext_resource type="Resource" path="res://data/legends/example_legend.tres" id="2_legend"]
+
+[resource]
+script = ExtResource("1_ship")
+id = &"p0_int"
+display_name = "P0-INT"
+description = "Stepped hull from the designer's sketch: a narrow top, 3 rows of 2 spots, over a wide base, 3 rows of 4 spots (18 spots). Doors on both sides of every row are the agent's reading of the sketch, for the designer to confirm."
+hull_layout_text = " ####
+ D..D
+ D..D
+ D..D
+D....D
+D....D
+D....D
+#EEEE#"
+legend = ExtResource("2_legend")

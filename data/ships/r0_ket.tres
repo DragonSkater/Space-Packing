@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ShipType" format=3]
+
+[ext_resource type="Script" path="res://game/ships/ship_type.gd" id="1_ship"]
+[ext_resource type="Resource" path="res://data/legends/example_legend.tres" id="2_legend"]
+
+[resource]
+script = ExtResource("1_ship")
+id = &"r0_ket"
+display_name = "R0-KET"
+description = "The easy-mode rocket, a tutorial: a hold 3 spots wide and 7 rows tall (21 spots), the whole left side open with a door on every row, an engine row beneath. Drawn from the designer's sketch; no walls inside."
+hull_layout_text = "#####
+D...#
+D...#
+D...#
+D...#
+D...#
+D...#
+D...#
+#EEE#"
+legend = ExtResource("2_legend")

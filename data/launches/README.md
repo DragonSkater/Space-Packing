@@ -6,4 +6,6 @@ A launch either plays a ready-made scenario (`scenario`, hull included), or carr
 
 A launch opens when the one named in its `requires` field has been flown with no required cargo left behind. The overview lists them in file-name order.
 
-Owner: the designer. Every file here is an agent's placeholder named `example_*`.
+`level_1_r0_ket_tutorial.tres` and `level_2_p0_int.tres` are the designer's levels, drawn from their sketches; each file's description says which of its values are starter values.
+
+Owner: the designer. Files named `example_*` are an agent's placeholders.

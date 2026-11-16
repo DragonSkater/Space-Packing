@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="ScheduledLaunch" format=3]
+
+[ext_resource type="Script" path="res://game/launch/scheduled_launch.gd" id="1_launch"]
+[ext_resource type="Script" path="res://core/packing/batch.gd" id="2_batch"]
+[ext_resource type="Resource" path="res://data/bodies/asteroid_b.tres" id="3_destination"]
+[ext_resource type="Resource" path="res://data/cargo/example_crate.tres" id="4_crate"]
+[ext_resource type="Resource" path="res://data/cargo/example_elbow.tres" id="5_elbow"]
+[ext_resource type="Resource" path="res://data/cargo/example_beam.tres" id="6_beam"]
+
+[sub_resource type="Resource" id="batch_1"]
+script = ExtResource("2_batch")
+item_type = ExtResource("4_crate")
+count = 5
+required = true
+
+[sub_resource type="Resource" id="batch_2"]
+script = ExtResource("2_batch")
+item_type = ExtResource("5_elbow")
+count = 2
+required = true
+
+[sub_resource type="Resource" id="batch_3"]
+script = ExtResource("2_batch")
+item_type = ExtResource("6_beam")
+count = 3
+required = true
+
+[resource]
+script = ExtResource("1_launch")
+display_name = "P0-INT"
+destination = ExtResource("3_destination")
+description = "The designer's second level, made for P0-INT: 5 crates, 2 L-shapes and 3 beams (17 spots in an 18-spot hull). The stack order is the order of the sketch's cargo list, and the 16 moves and the destination are starter values, for the designer to confirm."
+manifest = Array[ExtResource("2_batch")]([SubResource("batch_1"), SubResource("batch_2"), SubResource("batch_3")])
+move_limit = 16
